@@ -5,9 +5,11 @@ import (
 	"github.com/deadsy/sdfx/sdf"
 )
 
-const DUST_COVER_OUTER_CIRCUM = 37.5
-const DUST_COVER_INNER_CIRCUM = 14.0
-const DUST_COVER_HEIGHT = 1.48
+const (
+	DUST_COVER_OUTER_CIRCUM = 37.5
+	DUST_COVER_INNER_CIRCUM = 14.0
+	DUST_COVER_HEIGHT       = 1.48
+)
 
 func dustCover() (sdf.SDF3, error) {
 	cutoutHeight := 0.16
