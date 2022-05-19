@@ -7,21 +7,33 @@ import (
 )
 
 func topPlane() sdf.SDF2 {
-	top := sdf.Box2D(sdf.V2{X: 330, Y: 150}, 10)
+	top := sdf.Box2D(sdf.V2{X: 330, Y: 200}, 10)
 	joystick := joystick()
 	joystick = sdf.Transform2D(joystick, sdf.Rotate2d(sdf.DtoR(90)))
-	joystick = loggedMovement(joystick, sdf.V2{X: -top.BoundingBox().Max.X / 2, Y: 0}, "joystick")
+	joystick = loggedMovement(joystick, sdf.V2{X: -top.BoundingBox().Max.X / 2, Y: top.BoundingBox().Max.Y / 7}, "joystick")
 	top = sdf.Difference2D(top, joystick)
 
 	buttons := buttonRows()
-	buttons = loggedMovement(buttons, sdf.V2{X: top.BoundingBox().Max.X / 2, Y: 0}, "button cluster")
+	buttons = loggedMovement(buttons, sdf.V2{X: top.BoundingBox().Max.X / 2, Y: top.BoundingBox().Max.Y / 4}, "button cluster")
 	top = sdf.Difference2D(top, buttons)
 
 	auxillaryButtons := functionRow()
 	// this is a bit ugly
-	auxillaryButtons = loggedMovement(auxillaryButtons, sdf.V2{X: -top.BoundingBox().Max.X / 2.4, Y: 3 * (top.BoundingBox().Max.Y / 4)}, "function cluster")
+	auxillaryButtons = loggedMovement(auxillaryButtons, sdf.V2{X: -top.BoundingBox().Max.X / 2.4, Y: 4 * (top.BoundingBox().Max.Y / 5)}, "function cluster")
 	top = sdf.Difference2D(top, auxillaryButtons)
 	return top
+}
+
+func splitPlane() map[string]sdf.SDF2 {
+	planes := make(map[string]sdf.SDF2)
+	original := topPlane()
+	x, y := original.BoundingBox().Max.X*2, original.BoundingBox().Max.Y*2
+	cutout := sdf.Box2D(sdf.V2{X: x, Y: y}, 0)
+	cOLeft := sdf.Transform2D(cutout, sdf.Translate2d(sdf.V2{X: x / 2, Y: 0}))
+	cORight := sdf.Transform2D(cutout, sdf.Translate2d(sdf.V2{X: -x / 2, Y: 0}))
+	planes["left"] = sdf.Difference2D(original, cOLeft)
+	planes["right"] = sdf.Difference2D(original, cORight)
+	return planes
 }
 
 const M4_SCREW_DIAMETER = 4
