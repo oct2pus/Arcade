@@ -14,8 +14,8 @@ func main() {
 	bottom := bottom()
 	render.RenderDXF(hjkl, 300, "hjkl.dxf")
 	render.RenderDXF(sdf.Difference2D(buttons, buttonMounts), 300, "buttons.dxf")
+	render.RenderSTLSlow(top, 1200, "top.stl")
 	render.RenderSTLSlow(bottom, 1200, "bottom.stl")
 	render.RenderSTLSlow(plate, 1200, "plate.stl")
-	render.RenderSTLSlow(top, 1200, "top.stl")
 
 }
