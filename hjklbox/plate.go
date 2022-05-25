@@ -196,3 +196,15 @@ func lengthHoles(input, hole sdf.SDF2) sdf.SDF2 {
 	base2D = sdf.Difference2D(base2D, holes)
 	return sdf.Extrude3D(base2D, 1.2)
 } */
+
+// i measured 45.6 between holes instead of 47mm, lets try some sizes I guess?
+func pegholeTest() sdf.SDF3 {
+
+	return nil
+}
+
+usb hole is too low, needs to be a bit higher
+func usbmountheighttest() sdf.SDF3 {
+
+	return nil
+}
