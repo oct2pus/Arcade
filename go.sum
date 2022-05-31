@@ -8,6 +8,8 @@ github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/deadsy/sdfx v0.0.0-20220505234821-c59d311fd528 h1:tBQZwbMfwkFJJtXzQdP+Y0p4nYzaXT3uHAocfM0ZOXo=
 github.com/deadsy/sdfx v0.0.0-20220505234821-c59d311fd528/go.mod h1:bjsFZRp7zdb9m29hIDXPN/V5H/AkjJ1AIr5iBuj7FcI=
+github.com/deadsy/sdfx v0.0.0-20220508165057-718104295925 h1:CvjyreOQIm7VeHt2U0mq6iP8J0ZcjiXoxpgzLcYNJwo=
+github.com/deadsy/sdfx v0.0.0-20220508165057-718104295925/go.mod h1:bjsFZRp7zdb9m29hIDXPN/V5H/AkjJ1AIr5iBuj7FcI=
 github.com/dhconnelly/rtreego v1.1.0 h1:ejMaqN03N1s6Bdg6peGkNgBnYYSBHzcK8yhSPCB+rHE=
 github.com/dhconnelly/rtreego v1.1.0/go.mod h1:SDozu0Fjy17XH1svEXJgdYq8Tah6Zjfa/4Q33Z80+KM=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
@@ -75,6 +77,7 @@ golang.org/x/tools v0.0.0-20190927191325-030b2cf1153e/go.mod h1:b+2E5dAYhXwXZwtn
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 gonum.org/v1/gonum v0.0.0-20180816165407-929014505bf4/go.mod h1:Y+Yx5eoAFn32cQvJDxZx5Dpnq+c3wtXuadVZAcxbbBo=
 gonum.org/v1/gonum v0.8.2/go.mod h1:oe/vMfY3deqTw+1EZJhuvEW2iwGF1bW9wwu7XCu0+v0=
+gonum.org/v1/gonum v0.9.3 h1:DnoIG+QAMaF5NvxnGe/oKsgKcAc6PcUyl8q0VetfQ8s=
 gonum.org/v1/gonum v0.9.3/go.mod h1:TZumC3NeyVQskjXqmyWt4S3bINhy7B4eYwW69EbyX+0=
 gonum.org/v1/netlib v0.0.0-20190313105609-8cb42192e0e0/go.mod h1:wa6Ws7BG/ESfp6dHfk7C6KdzKA7wR7u/rKwOGE66zvw=
 gonum.org/v1/plot v0.0.0-20190515093506-e2840ee46a6b/go.mod h1:Wt8AAjI+ypCyYX3nZBvf6cAIx93T+c/OS2HFAYskSZc=
