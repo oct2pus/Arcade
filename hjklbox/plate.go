@@ -6,11 +6,11 @@ const (
 	PLATE_THICKNESS             = 2.825
 	TOP_THICKNESS               = 3.175 // 1/8th inch for possible thin acrylic top
 	BOTTOM_THICKNESS            = 20 - PLATE_THICKNESS - TOP_THICKNESS
-	PLATE_WIDTH                 = 218
-	PLATE_HEIGHT                = 130
-	TOLERANCE                   = 8
-	CABLE_HEAD_HEIGHT           = 6
-	CABLE_HEAD_WIDTH            = 10
+	PLATE_WIDTH                 = 218.0
+	PLATE_HEIGHT                = 130.0
+	TOLERANCE                   = 8.0
+	CABLE_HEAD_HEIGHT           = 6.0
+	CABLE_HEAD_WIDTH            = 10.0
 	USB_DAUGHTERBOARD_HEIGHT    = 12.6
 	USB_DAUGHTERBOARD_LENGTH    = 21.4
 	USB_DAUGHTERBOARD_THICKNESS = 4.7 // includes usb jack
@@ -111,35 +111,26 @@ func bottom() sdf.SDF3 {
 	bottom2D = sdf.Difference2D(bottom2D, usbCutoutPeg2D)
 
 	bottom := sdf.Extrude3D(bottom2D, PLATE_THICKNESS)
-
+	pegCount := 4
+	pegWall, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER)
 	pegHole, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER / 2)
-	pegHoles := make([]sdf.SDF2, PICO_PEG_HEIGHT)
-	for i := range pegHoles {
+	pegHoles := make([]sdf.SDF2, pegCount)
+	pegWalls := make([]sdf.SDF2, pegCount)
+	pegs := make([]sdf.SDF3, pegCount)
+	for i := 0; i < pegCount; i++ {
 		pegHoles[i] = pegHole
+		pegWalls[i] = pegWall
+		pegs[i] = sdf.Extrude3D(sdf.Difference2D(pegWall, pegHole), PICO_PEG_HEIGHT)
 	}
-	pegHoles[0] = sdf.Transform2D(pegHoles[0], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: 11.4 / 2}))   //pico mounting hole spacing
-	pegHoles[1] = sdf.Transform2D(pegHoles[1], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: -11.4 / 2}))  //pico mounting hole spacing
-	pegHoles[2] = sdf.Transform2D(pegHoles[2], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: -11.4 / 2})) //pico mounting hole spacing
-	pegHoles[3] = sdf.Transform2D(pegHoles[3], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: 11.4 / 2}))  //pico mounting hole spacing
+	pegs[0] = sdf.Transform3D(pegs[0], sdf.Translate3d(sdf.V3{X: 47.5 / 2, Y: 11.4 / 2, Z: 0})) // approximate spacing of pico holes
+	pegs[1] = sdf.Transform3D(pegs[1], sdf.Translate3d(sdf.V3{X: 47.5 / 2, Y: -11.4 / 2, Z: 0}))
+	pegs[2] = sdf.Transform3D(pegs[2], sdf.Translate3d(sdf.V3{X: -47.5 / 2, Y: -11.4 / 2, Z: 0}))
+	pegs[3] = sdf.Transform3D(pegs[3], sdf.Translate3d(sdf.V3{X: -47.5 / 2, Y: 11.4 / 2, Z: 0}))
 
-	peg, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER)
-	pegs := make([]sdf.SDF2, 4)
-	for i := range pegs {
-		pegs[i] = peg
-	}
-	pegs[0] = sdf.Transform2D(pegs[0], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: 11.4 / 2}))   //pico mounting hole spacing
-	pegs[1] = sdf.Transform2D(pegs[1], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: -11.4 / 2}))  //pico mounting hole spacing
-	pegs[2] = sdf.Transform2D(pegs[2], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: -11.4 / 2})) //pico mounting hole spacing
-	pegs[3] = sdf.Transform2D(pegs[3], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: 11.4 / 2}))  //pico mounting hole spacing
+	picoMount := sdf.Union3D(pegs...)
+	picoMount = sdf.Transform3D(picoMount, sdf.Translate3d(sdf.V3{X: PLATE_WIDTH / 4, Y: -PLATE_HEIGHT / 3, Z: PLATE_THICKNESS}))
 
-	mount2D := sdf.Union2D(pegs...)
-	mountingHoles2D := sdf.Union2D(pegHoles...)
-	mount2D = sdf.Difference2D(mount2D, mountingHoles2D)
-	mount2D = sdf.Transform2D(mount2D, sdf.Translate2d(sdf.V2{X: bottom2D.BoundingBox().Max.X / 2, Y: -bottom2D.BoundingBox().Max.X / 3}))
-	mount := sdf.Extrude3D(mount2D, 4) // M2x4mm screw holes
-	mount = sdf.Transform3D(mount, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: PLATE_THICKNESS}))
-
-	bottom = sdf.Union3D(bottom, mount)
+	bottom = sdf.Union3D(bottom, picoMount)
 
 	return bottom
 }
