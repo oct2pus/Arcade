@@ -1,5 +1,7 @@
 package main
 
+import "github.com/deadsy/sdfx/sdf"
+
 // 0 is perfect
 func usbHoleTest() sdf.SDF3 {
 	base2D := sdf.Box2D(sdf.V2{X: 50, Y: 10}, 0)
