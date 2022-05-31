@@ -5,7 +5,7 @@ import "github.com/deadsy/sdfx/sdf"
 const (
 	PLATE_THICKNESS             = 2.825
 	TOP_THICKNESS               = 3.175 // 1/8th inch for possible thin acrylic top
-	BOTTOM_THICKNESS            = 16 - PLATE_THICKNESS - TOP_THICKNESS
+	BOTTOM_THICKNESS            = 20 - PLATE_THICKNESS - TOP_THICKNESS
 	PLATE_WIDTH                 = 218
 	PLATE_HEIGHT                = 130
 	TOLERANCE                   = 8
@@ -17,6 +17,7 @@ const (
 	USB_CONNECTOR_LENGTH        = 8.8 // 1.1mm sticks out from daughterboard
 	USB_CONNECTOR_HEIGHT        = 7.2
 	USB_CONNECTOR_THICKNESS     = 3.2
+	PICO_PEG_HEIGHT             = 4.0
 )
 
 func plate() sdf.SDF3 {
@@ -71,7 +72,7 @@ func top() sdf.SDF3 {
 	return sdf.Extrude3D(top2D, TOP_THICKNESS)
 }
 
-func bottom() sdf.SDF3 {
+func walls() sdf.SDF3 {
 	cavity2D := sdf.Box2D(sdf.V2{X: PLATE_WIDTH - TOLERANCE, Y: PLATE_HEIGHT - TOLERANCE}, 5)
 	walls2D := sdf.Box2D(sdf.V2{X: PLATE_WIDTH, Y: PLATE_HEIGHT}, 5)
 	bottom2D := sdf.Difference2D(walls2D, cavity2D)
@@ -82,9 +83,94 @@ func bottom() sdf.SDF3 {
 	bottom2D = sdf.Union2D(bottom2D, cornerScrewHolders)
 	bottom2D = sdf.Difference2D(bottom2D, cornerScrews)
 	cavity2D = sdf.Difference2D(cavity2D, cornerScrewHolders)
+	/*
+		pegHole, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER / 2)
+		pegHoles := make([]sdf.SDF2, PICO_PEG_HEIGHT)
+		for i := range pegHoles {
+			pegHoles[i] = pegHole
+		}
+		pegHoles[0] = sdf.Transform2D(pegHoles[0], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: 11.4 / 2}))   //pico mounting hole spacing
+		pegHoles[1] = sdf.Transform2D(pegHoles[1], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: -11.4 / 2}))  //pico mounting hole spacing
+		pegHoles[2] = sdf.Transform2D(pegHoles[2], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: -11.4 / 2})) //pico mounting hole spacing
+		pegHoles[3] = sdf.Transform2D(pegHoles[3], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: 11.4 / 2}))  //pico mounting hole spacing
+
+		peg, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER)
+		pegs := make([]sdf.SDF2, 4)
+		for i := range pegs {
+			pegs[i] = peg
+		}
+		pegs[0] = sdf.Transform2D(pegs[0], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: 11.4 / 2}))   //pico mounting hole spacing
+		pegs[1] = sdf.Transform2D(pegs[1], sdf.Translate2d(sdf.V2{X: 47 / 2, Y: -11.4 / 2}))  //pico mounting hole spacing
+		pegs[2] = sdf.Transform2D(pegs[2], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: -11.4 / 2})) //pico mounting hole spacing
+		pegs[3] = sdf.Transform2D(pegs[3], sdf.Translate2d(sdf.V2{X: -47 / 2, Y: 11.4 / 2}))  //pico mounting hole spacing
+
+		mount2D := sdf.Union2D(pegs...)
+		mountingHoles2D := sdf.Union2D(pegHoles...)
+		mount2D = sdf.Difference2D(mount2D, mountingHoles2D)
+		mount2D = sdf.Transform2D(mount2D, sdf.Translate2d(sdf.V2{X: bottom2D.BoundingBox().Max.X / 2, Y: -bottom2D.BoundingBox().Max.X / 3}))
+		mount := sdf.Extrude3D(mount2D, 4) // M2x4mm screw holes
+		mount = sdf.Transform3D(mount, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: -0.1}))
+		//	bottom2D = sdf.Union2D(bottom2D, mount)
+
+		bottom := sdf.Extrude3D(bottom2D, BOTTOM_THICKNESS)
+		bottom = sdf.Union3D(bottom, mount)
+
+		cavity2D = sdf.Elongate2D(cavity2D, sdf.V2{X: 1, Y: 1})
+		floor := sdf.Extrude3D(cavity2D, PLATE_THICKNESS)
+		floor = sdf.Transform3D(floor, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: -(bottom.BoundingBox().Max.Z*2+floor.BoundingBox().Max.Z*2)/4 - 0.50}))
+		bottom = sdf.Union3D(bottom, floor)
+	*/
+	/*cableHole2D := sdf.Box2D(sdf.V2{X: CABLE_HEAD_WIDTH, Y: CABLE_HEAD_HEIGHT}, 0)
+	cableHole := sdf.Extrude3D(cableHole2D, TOLERANCE)
+	cableHole = sdf.Transform3D(cableHole, sdf.RotateX(sdf.DtoR(90)))
+	cableHole = sdf.Transform3D(cableHole, sdf.Translate3d(sdf.V3{X: 0, Y: (bottom.BoundingBox().Max.Y + cableHole.BoundingBox().Max.Y) - cableHole.BoundingBox().Max.Y*2, Z: cableHole.BoundingBox().Max.Z / 3}))
+	bottom = sdf.Difference3D(bottom, cableHole)*/
+
+	bottom := sdf.Extrude3D(bottom2D, BOTTOM_THICKNESS-PLATE_THICKNESS)
+
+	usbCutout, _ := sdf.Box3D(sdf.V3{X: USB_DAUGHTERBOARD_LENGTH + 0.4, Y: USB_DAUGHTERBOARD_HEIGHT + 0.4, Z: USB_DAUGHTERBOARD_THICKNESS + 10}, 0)
+	usbCutout = sdf.Transform3D(usbCutout, sdf.Translate3d(sdf.V3{X: 0, Y: (cavity2D.BoundingBox().Max.Y + usbCutout.BoundingBox().Max.Y) - usbCutout.BoundingBox().Max.Y*2 + 2.6, Z: 2})) // 5 for m3x5 screw
+	bottom = sdf.Difference3D(bottom, usbCutout)
+
+	/*usbCutoutPeg2D := M3ScrewHole()                                 // m2 hole
+	usbCutoutPeg := sdf.Extrude3D(usbCutoutPeg2D, BOTTOM_THICKNESS) // thickness of daughtboard pcb
+	usbCutoutPeg = sdf.Transform3D(usbCutoutPeg, sdf.Translate3d(sdf.V3{X: 7.8, Y: (cavity2D.BoundingBox().Max.Y + usbCutoutPeg.BoundingBox().Max.Y + 2) - usbCutoutPeg.BoundingBox().Max.Y*2, Z: -BOTTOM_THICKNESS / 2}))
+	usbCutoutPeg2 := sdf.Transform3D(usbCutoutPeg, sdf.Translate3d(sdf.V3{X: -15.6, Y: 0, Z: 0}))
+
+	usbCutoutPeg = sdf.Union3D(usbCutoutPeg, usbCutoutPeg2)
+	bottom = sdf.Difference3D(bottom, usbCutoutPeg)*/
+
+	usbPortHole, _ := sdf.Box3D(sdf.V3{X: USB_CONNECTOR_LENGTH + 0.5, Y: USB_CONNECTOR_HEIGHT + 0.5, Z: USB_CONNECTOR_THICKNESS + 0.5}, 0)
+	//	usbPortHole = sdf.Transform3D(usbPortHole, sdf.RotateZ(sdf.DtoR(90)))
+	usbPortHole = sdf.Transform3D(usbPortHole, sdf.Translate3d(sdf.V3{X: 0, Y: PLATE_HEIGHT / 2, Z: 0})) // Z is thickness of board
+
+	bottom = sdf.Difference3D(bottom, usbPortHole)
+
+	return bottom
+}
+
+func bottom() sdf.SDF3 {
+	bottom2D := sdf.Box2D(sdf.V2{X: PLATE_WIDTH, Y: PLATE_HEIGHT}, 5)
+	cornerScrewHolder, _ := sdf.Circle2D((M4_SCREW_HOLE_DIAMETER + 8) / 2)
+	cornerScrewHolders := cornerHoles(bottom2D, cornerScrewHolder)
+	cornerScrews := cornerHoles(bottom2D, M4screwHole())
+
+	bottom2D = sdf.Union2D(bottom2D, cornerScrewHolders)
+	bottom2D = sdf.Difference2D(bottom2D, cornerScrews)
+
+	usbCutoutPeg2D := M3ScrewHole()
+	usbCutoutPeg2D = sdf.Transform2D(usbCutoutPeg2D, sdf.Translate2d(sdf.V2{X: 7.8, Y: (bottom2D.BoundingBox().Max.Y + usbCutoutPeg2D.BoundingBox().Max.Y - 2) - usbCutoutPeg2D.BoundingBox().Max.Y*2}))
+	usbCutoutPeg2D = sdf.Union2D(usbCutoutPeg2D, sdf.Transform2D(usbCutoutPeg2D, sdf.Translate2d(sdf.V2{X: -15.6, Y: 0})))
+
+	bottom2D = sdf.Difference2D(bottom2D, usbCutoutPeg2D)
+
+	//	usbCutoutPeg := sdf.Extrude3D(usbCutoutPeg2D, BOTTOM_THICKNESS) // thickness of daughtboard pcb
+	//	usbCutoutPeg = sdf.Transform3D(usbCutoutPeg, sdf.Translate3d(sdf.V3{X: 7.8, Y: (cavity2D.BoundingBox().Max.Y + usbCutoutPeg.BoundingBox().Max.Y + 2) - usbCutoutPeg.BoundingBox().Max.Y*2, Z: -BOTTOM_THICKNESS / 2}))
+	//	usbCutoutPeg2 := sdf.Transform3D(usbCutoutPeg, sdf.Translate3d(sdf.V3{X: -15.6, Y: 0, Z: 0}))
+	bottom := sdf.Extrude3D(bottom2D, PLATE_THICKNESS)
 
 	pegHole, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER / 2)
-	pegHoles := make([]sdf.SDF2, 4)
+	pegHoles := make([]sdf.SDF2, PICO_PEG_HEIGHT)
 	for i := range pegHoles {
 		pegHoles[i] = pegHole
 	}
@@ -108,39 +194,9 @@ func bottom() sdf.SDF3 {
 	mount2D = sdf.Difference2D(mount2D, mountingHoles2D)
 	mount2D = sdf.Transform2D(mount2D, sdf.Translate2d(sdf.V2{X: bottom2D.BoundingBox().Max.X / 2, Y: -bottom2D.BoundingBox().Max.X / 3}))
 	mount := sdf.Extrude3D(mount2D, 4) // M2x4mm screw holes
-	mount = sdf.Transform3D(mount, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: -0.1}))
-	//	bottom2D = sdf.Union2D(bottom2D, mount)
+	mount = sdf.Transform3D(mount, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: PLATE_THICKNESS}))
 
-	bottom := sdf.Extrude3D(bottom2D, BOTTOM_THICKNESS)
 	bottom = sdf.Union3D(bottom, mount)
-
-	cavity2D = sdf.Elongate2D(cavity2D, sdf.V2{X: 1, Y: 1})
-	floor := sdf.Extrude3D(cavity2D, PLATE_THICKNESS)
-	floor = sdf.Transform3D(floor, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: -(bottom.BoundingBox().Max.Z*2+floor.BoundingBox().Max.Z*2)/4 - 0.50}))
-	bottom = sdf.Union3D(bottom, floor)
-
-	/*cableHole2D := sdf.Box2D(sdf.V2{X: CABLE_HEAD_WIDTH, Y: CABLE_HEAD_HEIGHT}, 0)
-	cableHole := sdf.Extrude3D(cableHole2D, TOLERANCE)
-	cableHole = sdf.Transform3D(cableHole, sdf.RotateX(sdf.DtoR(90)))
-	cableHole = sdf.Transform3D(cableHole, sdf.Translate3d(sdf.V3{X: 0, Y: (bottom.BoundingBox().Max.Y + cableHole.BoundingBox().Max.Y) - cableHole.BoundingBox().Max.Y*2, Z: cableHole.BoundingBox().Max.Z / 3}))
-	bottom = sdf.Difference3D(bottom, cableHole)*/
-
-	usbCutout, _ := sdf.Box3D(sdf.V3{X: USB_DAUGHTERBOARD_LENGTH + 0.4, Y: USB_DAUGHTERBOARD_HEIGHT + 0.4, Z: USB_DAUGHTERBOARD_THICKNESS + 3.8}, 0)
-	usbCutout = sdf.Transform3D(usbCutout, sdf.Translate3d(sdf.V3{X: 0, Y: (floor.BoundingBox().Max.Y + usbCutout.BoundingBox().Max.Y) - usbCutout.BoundingBox().Max.Y*2 + 2.6, Z: 2})) // 5 for m3x5 screw
-	bottom = sdf.Difference3D(bottom, usbCutout)
-
-	usbCutoutPeg2D := M3ScrewHole()                                 // m2 hole
-	usbCutoutPeg := sdf.Extrude3D(usbCutoutPeg2D, BOTTOM_THICKNESS) // thickness of daughtboard pcb
-	usbCutoutPeg = sdf.Transform3D(usbCutoutPeg, sdf.Translate3d(sdf.V3{X: 7.8, Y: (floor.BoundingBox().Max.Y + usbCutoutPeg.BoundingBox().Max.Y + 2) - usbCutoutPeg.BoundingBox().Max.Y*2, Z: -BOTTOM_THICKNESS / 2}))
-	usbCutoutPeg2 := sdf.Transform3D(usbCutoutPeg, sdf.Translate3d(sdf.V3{X: -15.6, Y: 0, Z: 0}))
-
-	usbCutoutPeg = sdf.Union3D(usbCutoutPeg, usbCutoutPeg2)
-	bottom = sdf.Difference3D(bottom, usbCutoutPeg)
-
-	usbPortHole, _ := sdf.Box3D(sdf.V3{X: USB_CONNECTOR_LENGTH, Y: USB_CONNECTOR_HEIGHT, Z: USB_CONNECTOR_THICKNESS}, 0)
-	usbPortHole = sdf.Transform3D(usbPortHole, sdf.Translate3d(sdf.V3{X: 0, Y: PLATE_HEIGHT / 2, Z: 1.5 / 2})) // Z is thickness of board
-
-	bottom = sdf.Difference3D(bottom, usbPortHole)
 
 	return bottom
 }
@@ -198,13 +254,53 @@ func lengthHoles(input, hole sdf.SDF2) sdf.SDF2 {
 } */
 
 // i measured 45.6 between holes instead of 47mm, lets try some sizes I guess?
-func pegholeTest() sdf.SDF3 {
+func pegholeTest(pegDistances sdf.V2) sdf.SDF3 {
+	plane2D := sdf.Box2D(sdf.V2{X: 50, Y: 30}, 0)
+	pegHole, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER / 2)
+	pegHoles := make([]sdf.SDF2, 4)
+	for i := range pegHoles {
+		pegHoles[i] = pegHole
+	}
+	pegHoles[0] = sdf.Transform2D(pegHoles[0], sdf.Translate2d(sdf.V2{X: pegDistances.X / 2, Y: pegDistances.Y / 2}))   //pico mounting hole spacing
+	pegHoles[1] = sdf.Transform2D(pegHoles[1], sdf.Translate2d(sdf.V2{X: pegDistances.X / 2, Y: -pegDistances.Y / 2}))  //pico mounting hole spacing
+	pegHoles[2] = sdf.Transform2D(pegHoles[2], sdf.Translate2d(sdf.V2{X: -pegDistances.X / 2, Y: -pegDistances.Y / 2})) //pico mounting hole spacing
+	pegHoles[3] = sdf.Transform2D(pegHoles[3], sdf.Translate2d(sdf.V2{X: -pegDistances.X / 2, Y: pegDistances.Y / 2}))  //pico mounting hole spacing
 
-	return nil
+	peg, _ := sdf.Circle2D(M2_SCREW_HOLE_DIAMETER)
+	pegs := make([]sdf.SDF2, 4)
+	for i := range pegs {
+		pegs[i] = peg
+	}
+	pegs[0] = sdf.Transform2D(pegs[0], sdf.Translate2d(sdf.V2{X: pegDistances.X / 2, Y: pegDistances.Y / 2}))   //pico mounting hole spacing
+	pegs[1] = sdf.Transform2D(pegs[1], sdf.Translate2d(sdf.V2{X: pegDistances.X / 2, Y: -pegDistances.Y / 2}))  //pico mounting hole spacing
+	pegs[2] = sdf.Transform2D(pegs[2], sdf.Translate2d(sdf.V2{X: -pegDistances.X / 2, Y: -pegDistances.Y / 2})) //pico mounting hole spacing
+	pegs[3] = sdf.Transform2D(pegs[3], sdf.Translate2d(sdf.V2{X: -pegDistances.X / 2, Y: pegDistances.Y / 2}))  //pico mounting hole spacing
+
+	mountingHoles2D := sdf.Union2D(pegHoles...)
+	mounts2D := sdf.Union2D(pegs...)
+	mounts2D = sdf.Difference2D(mounts2D, mountingHoles2D)
+
+	mounts := sdf.Extrude3D(mounts2D, PICO_PEG_HEIGHT)
+	plane := sdf.Extrude3D(plane2D, PICO_PEG_HEIGHT/2)
+
+	mounts = sdf.Transform3D(mounts, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: PICO_PEG_HEIGHT / 4}))
+
+	return sdf.Union3D(mounts, plane)
 }
 
-usb hole is too low, needs to be a bit higher
-func usbmountheighttest() sdf.SDF3 {
+// usb hole is too low, needs to be a bit higher
+func usbmountHeightTest() sdf.SDF3 {
+	box, _ := sdf.Box3D(sdf.V3{X: 2, Y: 15, Z: BOTTOM_THICKNESS}, 0)
+	floor, _ := sdf.Box3D(sdf.V3{X: 12, Y: 15, Z: 1}, 0)
 
-	return nil
+	floor = sdf.Transform3D(floor, sdf.Translate3d(sdf.V3{X: 5, Y: 0, Z: (-BOTTOM_THICKNESS / 2) - (-floor.BoundingBox().Max.Z)}))
+
+	usbPortHole, _ := sdf.Box3D(sdf.V3{X: USB_CONNECTOR_LENGTH + 0.5, Y: USB_CONNECTOR_HEIGHT + 0.5, Z: USB_CONNECTOR_THICKNESS + 0.5}, 0)
+	usbPortHole = sdf.Transform3D(usbPortHole, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: 0})) // Z is thickness of board
+	usbPortHole = sdf.Transform3D(usbPortHole, sdf.RotateZ(sdf.DtoR(90)))
+
+	box = sdf.Difference3D(box, usbPortHole)
+	box = sdf.Union3D(box, floor)
+
+	return box
 }

@@ -3,9 +3,9 @@ package main
 import "github.com/deadsy/sdfx/sdf"
 
 const (
-	M4_SCREW_HOLE_DIAMETER = 4.5 //m4 screw
-	M3_SCREW_HOLE_DIAMETER = 3.4 //m3 screw
-	M2_SCREW_HOLE_DIAMETER = 2.4
+	M4_SCREW_HOLE_DIAMETER = 4   //m4 screw
+	M3_SCREW_HOLE_DIAMETER = 3.1 //m3 screw
+	M2_SCREW_HOLE_DIAMETER = 2   //m2 screw
 )
 
 func M4screwHole() sdf.SDF2 {
