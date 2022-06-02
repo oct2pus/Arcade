@@ -46,6 +46,7 @@ func plate() sdf.SDF3 {
 
 func top() sdf.SDF3 {
 	top2D := sdf.Box2D(sdf.V2{X: PLATE_WIDTH, Y: PLATE_HEIGHT}, 5)
+
 	hjkl := buttonRow()
 	hjkl = sdf.Box2D(sdf.V2{X: hjkl.BoundingBox().Max.X*2 + 2, Y: hjkl.BoundingBox().Max.Y*2 + 2}, 1)
 	hjkl = sdf.Transform2D(hjkl, sdf.Rotate2d(sdf.DtoR(30)))
@@ -83,12 +84,12 @@ func walls() sdf.SDF3 {
 	cavity2D = sdf.Difference2D(cavity2D, cornerScrewHolders)
 	bottom := sdf.Extrude3D(bottom2D, BOTTOM_THICKNESS-PLATE_THICKNESS)
 
-	usbCutout, _ := sdf.Box3D(sdf.V3{X: USB_DAUGHTERBOARD_LENGTH + 0.4, Y: USB_DAUGHTERBOARD_HEIGHT + 0.4, Z: USB_DAUGHTERBOARD_THICKNESS + 10}, 0)
-	usbCutout = sdf.Transform3D(usbCutout, sdf.Translate3d(sdf.V3{X: 0, Y: (cavity2D.BoundingBox().Max.Y + usbCutout.BoundingBox().Max.Y) - usbCutout.BoundingBox().Max.Y*2 + 2.6, Z: 2})) // 5 for m3x5 screw
+	usbCutout, _ := sdf.Box3D(sdf.V3{X: USB_DAUGHTERBOARD_LENGTH + 0.4, Y: USB_DAUGHTERBOARD_HEIGHT + 0.4, Z: USB_DAUGHTERBOARD_THICKNESS + 3}, 0)
+	usbCutout = sdf.Transform3D(usbCutout, sdf.Translate3d(sdf.V3{X: 0, Y: (cavity2D.BoundingBox().Max.Y + usbCutout.BoundingBox().Max.Y) - usbCutout.BoundingBox().Max.Y*2 + 2.6, Z: -2})) // 5 for m3x5 screw
 	bottom = sdf.Difference3D(bottom, usbCutout)
 
 	usbPortHole, _ := sdf.Box3D(sdf.V3{X: USB_CONNECTOR_LENGTH + 0.5, Y: USB_CONNECTOR_HEIGHT + 0.5, Z: USB_CONNECTOR_THICKNESS + 0.5}, 0)
-	usbPortHole = sdf.Transform3D(usbPortHole, sdf.Translate3d(sdf.V3{X: 0, Y: PLATE_HEIGHT / 2, Z: 0})) // Z is thickness of board
+	usbPortHole = sdf.Transform3D(usbPortHole, sdf.Translate3d(sdf.V3{X: 0, Y: PLATE_HEIGHT / 2, Z: -2})) // Z is thickness of board
 
 	bottom = sdf.Difference3D(bottom, usbPortHole)
 
@@ -105,8 +106,8 @@ func bottom() sdf.SDF3 {
 	bottom2D = sdf.Difference2D(bottom2D, cornerScrews)
 
 	usbCutoutPeg2D := M3ScrewHole()
-	usbCutoutPeg2D = sdf.Transform2D(usbCutoutPeg2D, sdf.Translate2d(sdf.V2{X: 7.8, Y: (bottom2D.BoundingBox().Max.Y + usbCutoutPeg2D.BoundingBox().Max.Y - 2) - usbCutoutPeg2D.BoundingBox().Max.Y*2}))
-	usbCutoutPeg2D = sdf.Union2D(usbCutoutPeg2D, sdf.Transform2D(usbCutoutPeg2D, sdf.Translate2d(sdf.V2{X: -15.6, Y: 0})))
+	usbCutoutPeg2D = sdf.Transform2D(usbCutoutPeg2D, sdf.Translate2d(sdf.V2{X: 8.3, Y: (bottom2D.BoundingBox().Max.Y + usbCutoutPeg2D.BoundingBox().Max.Y - 3.2) - usbCutoutPeg2D.BoundingBox().Max.Y*2}))
+	usbCutoutPeg2D = sdf.Union2D(usbCutoutPeg2D, sdf.Transform2D(usbCutoutPeg2D, sdf.Translate2d(sdf.V2{X: -16.6, Y: 0})))
 
 	bottom2D = sdf.Difference2D(bottom2D, usbCutoutPeg2D)
 
