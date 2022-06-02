@@ -12,8 +12,6 @@ func keycap() sdf.SDF3 {
 	keycapBottom2D := sdf.Box2D(sdf.V2{X: 14, Y: 14}, 1)
 	keycapBottom2D = sdf.Difference2D(keycapBottom2D, keycapTop2D)
 
-	/*	keycapTop := sdf.Extrude3D(keycapTop2D, 1)
-		keycapTop = sdf.Transform3D(keycapTop, sdf.Loft3D())*/
 	keycapBottom := sdf.Extrude3D(keycapBottom2D, 1)
 	keycapBottom = sdf.Transform3D(keycapBottom, sdf.Translate3d(sdf.V3{X: 0, Y: 0, Z: 1}))
 	keycap := sdf.ScaleExtrude3D(keycapTop2D, 1, v2.Vec{X: 1.0775, Y: 1.0775})
