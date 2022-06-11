@@ -10,9 +10,11 @@ func main() {
 	top := topPlane()
 	topPlanes := splitPlane()
 
+	render.RenderDXF(top, 300, "top.dxf")
+	render.RenderDXF(wallsPlane(), 300, "walls.dxf")
 	for k, v := range topPlanes {
 		render.RenderDXF(v, 300, k+".dxf")
 		render.ToSTL(sdf.Extrude3D(v, 2), 400, k+".stl", dc.NewDualContouringDefault())
 	}
-	render.RenderDXF(top, 300, "top.dxf")
+
 }

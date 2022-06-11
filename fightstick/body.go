@@ -6,13 +6,17 @@ import (
 )
 
 const (
-	BODY_SIZE_X = 300
-	BODY_SIZE_Y = 220
-	BODY_SIZE_Z = 2 + 0 + 0 //Top + Walls + Base
+	BODY_SIZE_X    = 300
+	BODY_SIZE_Y    = 220
+	BODY_SIZE_Z    = 2 + 0 + 0 //Top + Walls + Base
+	BODY_CURVE     = 10
+	WALL_THICKNESS = 30
 )
 
+// topPlane produces a 2D top-down image of the fightstick's top panel.
 func topPlane() sdf.SDF2 {
-	top := sdf.Box2D(v2.Vec{X: 300, Y: 220}, 10)
+	top := sdf.Box2D(v2.Vec{X: BODY_SIZE_X, Y: BODY_SIZE_Y}, BODY_CURVE)
+
 	joystick := joystick(v2.Vec{X: 84, Y: 10 + 10 + 20}) // as listed on jlfmeasure.jpg
 	joystick = sdf.Transform2D(joystick, sdf.Rotate2d(sdf.DtoR(90)))
 	joystick = loggedMovement(joystick, v2.Vec{X: -top.BoundingBox().Max.X / 2, Y: top.BoundingBox().Max.Y / 7}, "joystick")
@@ -26,6 +30,31 @@ func topPlane() sdf.SDF2 {
 	// this is a bit ugly
 	auxillaryButtons = loggedMovement(auxillaryButtons, v2.Vec{X: -top.BoundingBox().Max.X / 2.4, Y: 4 * (top.BoundingBox().Max.Y / 5)}, "function cluster")
 	top = sdf.Difference2D(top, auxillaryButtons)
-	return top
 
+	return top
+}
+
+// wallsPlane produces a 2D top-down image of the fightstick's walls.
+func wallsPlane() sdf.SDF2 {
+	walls := sdf.Box2D(v2.Vec{X: BODY_SIZE_X, Y: BODY_SIZE_Y}, BODY_CURVE)
+	body := sdf.Box2D(v2.Vec{X: BODY_SIZE_X - WALL_THICKNESS, Y: BODY_SIZE_Y - WALL_THICKNESS}, BODY_CURVE)
+
+	walls = sdf.Difference2D(walls, body)
+
+	lrCutout := trapezoid(v2.Vec{X: (BODY_SIZE_Y - 20), Y: WALL_THICKNESS / 4}, -20)
+	lCutout := sdf.Transform2D(lrCutout, sdf.Rotate2d(sdf.DtoR(270)))
+	rCutout := sdf.Transform2D(lCutout, sdf.MirrorY())
+	lCutout = sdf.Transform2D(lCutout, sdf.Translate2d(v2.Vec{X: -((BODY_SIZE_X / 2) - lCutout.BoundingBox().Max.X), Y: 0}))
+	rCutout = sdf.Transform2D(rCutout, sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - rCutout.BoundingBox().Max.X, Y: 0}))
+	walls = sdf.Difference2D(walls, lCutout)
+	walls = sdf.Difference2D(walls, rCutout)
+
+	tbCutout := trapezoid(v2.Vec{X: (BODY_SIZE_X - 20), Y: WALL_THICKNESS / 4}, -20)
+	tCutout := sdf.Transform2D(tbCutout, sdf.Rotate2d(sdf.DtoR(180)))
+	tCutout = sdf.Transform2D(tCutout, sdf.Translate2d(v2.Vec{X: 0, Y: ((BODY_SIZE_Y / 2) - tbCutout.BoundingBox().Max.Y)}))
+	bCutout := sdf.Transform2D(tbCutout, sdf.Translate2d(v2.Vec{X: 0, Y: -((BODY_SIZE_Y / 2) - tbCutout.BoundingBox().Max.Y)}))
+	walls = sdf.Difference2D(walls, tCutout)
+	walls = sdf.Difference2D(walls, bCutout)
+
+	return walls
 }
