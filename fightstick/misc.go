@@ -13,18 +13,6 @@ func loggedMovement(input sdf.SDF2, displacement sdf.V2, label string) sdf.SDF2 
 	return output
 }
 
-func splitPlane() map[string]sdf.SDF2 {
-	planes := make(map[string]sdf.SDF2)
-	original := topPlane()
-	x, y := original.BoundingBox().Max.X*2, original.BoundingBox().Max.Y*2
-	cutout := sdf.Box2D(sdf.V2{X: x, Y: y}, 0)
-	cOLeft := sdf.Transform2D(cutout, sdf.Translate2d(sdf.V2{X: x / 2, Y: 0}))
-	cORight := sdf.Transform2D(cutout, sdf.Translate2d(sdf.V2{X: -x / 2, Y: 0}))
-	planes["left"] = sdf.Difference2D(original, cOLeft)
-	planes["right"] = sdf.Difference2D(original, cORight)
-	return planes
-}
-
 // trapezoid creates a trapezoid from a vector, base is a v2.Vector, xChange modifies the top half.
 // positive xChange values make the top half larger, negative xChange values make the top half smaller.
 func trapezoid(base v2.Vec, xChange float64) sdf.SDF2 {
@@ -33,7 +21,6 @@ func trapezoid(base v2.Vec, xChange float64) sdf.SDF2 {
 		v2.Vec{X: -xChange, Y: base.Y},
 		v2.Vec{X: base.X + xChange, Y: base.Y},
 		v2.Vec{X: base.X, Y: 0},
-		v2.Vec{X: 0, Y: 0},
 	}
 
 	trapezoid, err := sdf.Polygon2D(dimensions)
