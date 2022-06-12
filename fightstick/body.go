@@ -10,7 +10,7 @@ const (
 	BODY_SIZE_Y    = 220
 	BODY_SIZE_Z    = 2 + 0 + 0 //Top + Walls + Base
 	BODY_CURVE     = 10
-	WALL_THICKNESS = 30
+	WALL_THICKNESS = 15
 )
 
 // topPlane produces a 2D top-down image of the fightstick's top panel.
@@ -41,20 +41,29 @@ func wallsPlane() sdf.SDF2 {
 
 	walls = sdf.Difference2D(walls, body)
 
-	lrCutout := trapezoid(v2.Vec{X: (BODY_SIZE_Y - 20), Y: WALL_THICKNESS / 4}, -20)
-	lCutout := sdf.Transform2D(lrCutout, sdf.Rotate2d(sdf.DtoR(270)))
-	rCutout := sdf.Transform2D(lCutout, sdf.MirrorY())
-	lCutout = sdf.Transform2D(lCutout, sdf.Translate2d(v2.Vec{X: -((BODY_SIZE_X / 2) - lCutout.BoundingBox().Max.X), Y: 0}))
-	rCutout = sdf.Transform2D(rCutout, sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - rCutout.BoundingBox().Max.X, Y: 0}))
-	walls = sdf.Difference2D(walls, lCutout)
-	walls = sdf.Difference2D(walls, rCutout)
+	// left and right side
+	lrCutout := trapezoid(v2.Vec{X: (BODY_SIZE_Y - 20) / 2, Y: WALL_THICKNESS / 4}, -30)
+	ltCutout := sdf.Transform2D(lrCutout, sdf.Rotate2d(sdf.DtoR(270)))
+	ltCutout = sdf.Transform2D(ltCutout, sdf.Translate2d(v2.Vec{X: -((BODY_SIZE_X / 2) - ltCutout.BoundingBox().Max.X), Y: BODY_SIZE_Y / 4}))
+	lbCutout := sdf.Transform2D(ltCutout, sdf.MirrorX())
+	rtCutout := sdf.Transform2D(ltCutout, sdf.MirrorY())
+	rbCutout := sdf.Transform2D(lbCutout, sdf.MirrorY())
+	walls = sdf.Difference2D(walls, ltCutout)
+	walls = sdf.Difference2D(walls, lbCutout)
+	walls = sdf.Difference2D(walls, rtCutout)
+	walls = sdf.Difference2D(walls, rbCutout)
 
-	tbCutout := trapezoid(v2.Vec{X: (BODY_SIZE_X - 20), Y: WALL_THICKNESS / 4}, -20)
-	tCutout := sdf.Transform2D(tbCutout, sdf.Rotate2d(sdf.DtoR(180)))
-	tCutout = sdf.Transform2D(tCutout, sdf.Translate2d(v2.Vec{X: 0, Y: ((BODY_SIZE_Y / 2) - tbCutout.BoundingBox().Max.Y)}))
-	bCutout := sdf.Transform2D(tbCutout, sdf.Translate2d(v2.Vec{X: 0, Y: -((BODY_SIZE_Y / 2) - tbCutout.BoundingBox().Max.Y)}))
-	walls = sdf.Difference2D(walls, tCutout)
-	walls = sdf.Difference2D(walls, bCutout)
+	// top and bottom sides
+	// TODO: This is producing holes in the render :(
+	tbCutout := trapezoid(v2.Vec{X: (BODY_SIZE_X - 20) / 2, Y: WALL_THICKNESS / 4}, -40)
+	blCutout := sdf.Transform2D(tbCutout, sdf.Translate2d(v2.Vec{X: -(BODY_SIZE_X / 4), Y: -((BODY_SIZE_Y / 2) - tbCutout.BoundingBox().Max.Y)}))
+	brCutout := sdf.Transform2D(blCutout, sdf.MirrorY())
+	tlCutout := sdf.Transform2D(blCutout, sdf.MirrorX())
+	trCutout := sdf.Transform2D(tlCutout, sdf.MirrorY())
+	walls = sdf.Difference2D(walls, blCutout)
+	walls = sdf.Difference2D(walls, brCutout)
+	walls = sdf.Difference2D(walls, tlCutout)
+	walls = sdf.Difference2D(walls, trCutout)
 
 	return walls
 }
