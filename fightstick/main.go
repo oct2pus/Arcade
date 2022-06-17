@@ -12,8 +12,8 @@ func main() {
 	parts.add(split2DPlane("top", top, 2))
 	parts.add(split2DPlane("walls", walls, 45))
 
-	render.RenderDXF(top, 400, "top.dxf")
-	render.RenderDXF(wallsPlane(), 400, "walls.dxf")
+	render.RenderDXF(top, 600, "top.dxf")
+	render.RenderDXF(wallsPlane(), 600, "walls.dxf")
 	//	render.ToSTL(sdf.Extrude3D(walls, 2), 400, "walls.stl", dc.NewDualContouringDefault())
 
 	for k, v := range parts {
