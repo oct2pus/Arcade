@@ -8,7 +8,7 @@ import (
 const (
 	BODY_SIZE_X    = 300
 	BODY_SIZE_Y    = 215
-	BODY_SIZE_Z    = 2 + 45 + 0 //Top + Walls + Base
+	BODY_SIZE_Z    = 3 + 45 + 3 //Top + Walls + Base
 	BODY_CURVE     = 10
 	WALL_THICKNESS = 6.9
 )
@@ -59,6 +59,15 @@ func wallsPlane() sdf.SDF2 {
 	walls = sdf.Difference2D(walls, screws)
 
 	return walls
+}
+
+func bottomPlane() sdf.SDF2 {
+	bottom := sdf.Box2D(v2.Vec{X: BODY_SIZE_X, Y: BODY_SIZE_Y}, BODY_CURVE)
+
+	screws := screwHoles()
+	bottom = sdf.Difference2D(bottom, screws)
+
+	return bottom
 }
 
 // screwHoles produces m4 screwHoles along the sides of the piece.

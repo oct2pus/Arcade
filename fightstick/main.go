@@ -1,24 +1,27 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/deadsy/sdfx/render"
 	"github.com/deadsy/sdfx/render/dc"
+	"github.com/deadsy/sdfx/sdf"
 )
 
 func main() {
-	top := topPlane()
-	walls := wallsPlane()
-	parts := make(Parts)
-	parts.add(split2DPlane("top", top, 2))
-	parts.add(split2DPlane("walls", walls, 45))
-
-	render.RenderDXF(top, 600, "top.dxf")
+	tops := split2DPlane(topPlane())
+	walls := split2DPlane(wallsPlane())
+	bottoms := split2DPlane(bottomPlane())
+	render.RenderDXF(topPlane(), 600, "top.dxf")
 	render.RenderDXF(wallsPlane(), 600, "walls.dxf")
-	//	render.ToSTL(sdf.Extrude3D(walls, 2), 400, "walls.stl", dc.NewDualContouringDefault())
-
-	for k, v := range parts {
-		render.RenderDXF(v.SDF2, 400, k+".dxf")
-		render.ToSTL(v.SDF3, 400, k+".stl", dc.NewDualContouringDefault())
+	for i, ele := range tops {
+		render.ToSTL(sdf.Extrude3D(ele, 3), 400, "top-"+strconv.Itoa(i)+".stl", dc.NewDualContouringDefault())
 	}
-
+	for i, ele := range walls {
+		render.ToSTL(sdf.Extrude3D(ele, 45), 400, "wall-"+strconv.Itoa(i)+".stl", dc.NewDualContouringDefault())
+	}
+	for i, ele := range bottoms {
+		render.ToSTL(sdf.Extrude3D(ele, 3), 400, "bottom-"+strconv.Itoa(i)+".stl", dc.NewDualContouringDefault())
+	}
+	//	render.ToSTL(sdf.Extrude3D(walls, 2), 400, "walls.stl", dc.NewDualContouringDefault())
 }
