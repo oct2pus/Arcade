@@ -23,5 +23,4 @@ func main() {
 	for i, ele := range bottoms {
 		render.ToSTL(sdf.Extrude3D(ele, 3), 400, "bottom-"+strconv.Itoa(i)+".stl", dc.NewDualContouringDefault())
 	}
-	//	render.ToSTL(sdf.Extrude3D(walls, 2), 400, "walls.stl", dc.NewDualContouringDefault())
 }
