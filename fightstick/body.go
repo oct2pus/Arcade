@@ -8,12 +8,13 @@ import (
 const (
 	BODY_SIZE_X    = 300
 	BODY_SIZE_Y    = 215
-	BODY_SIZE_Z    = 2 + 0 + 0 //Top + Walls + Base
+	BODY_SIZE_Z    = 2 + 45 + 0 //Top + Walls + Base
 	BODY_CURVE     = 10
 	WALL_THICKNESS = 6.9
 )
 
 // topPlane produces a 2D top-down image of the fightstick's top panel.
+// TODO: need to add countersinks for the screws lol.
 func topPlane() sdf.SDF2 {
 	top := sdf.Box2D(v2.Vec{X: BODY_SIZE_X, Y: BODY_SIZE_Y}, BODY_CURVE)
 
@@ -33,19 +34,26 @@ func topPlane() sdf.SDF2 {
 }
 
 // wallsPlane produces a 2D top-down image of the fightstick's walls.
-// TODO: use trapezoid to create simpler internal corners for screw holes.
 func wallsPlane() sdf.SDF2 {
 	walls := sdf.Box2D(v2.Vec{X: BODY_SIZE_X, Y: BODY_SIZE_Y}, BODY_CURVE)
 	body := sdf.Box2D(v2.Vec{X: BODY_SIZE_X - WALL_THICKNESS, Y: BODY_SIZE_Y - WALL_THICKNESS}, BODY_CURVE)
 	walls = sdf.Difference2D(walls, body)
 
-	screwProtrosion := sdf.Box2D(v2.Vec{X: WALL_THICKNESS / 3, Y: WALL_THICKNESS * 2.2}, 0)
-	rProt := loggedMovement(screwProtrosion, v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS / 1.6), Y: 0}, "right screw protrosion")
-	lProt := loggedMovement(screwProtrosion, v2.Vec{X: -(BODY_SIZE_X / 2) - -(WALL_THICKNESS / 1.6), Y: 0}, "left screw protrosion")
-	tProt := sdf.Transform2D(screwProtrosion, sdf.Rotate2d(sdf.DtoR(90)))
-	bProt := loggedMovement(tProt, v2.Vec{X: 0, Y: -(BODY_SIZE_Y / 2) - -(WALL_THICKNESS / 1.6)}, "bottom screw protrosion")
-	tProt = loggedMovement(tProt, v2.Vec{X: 0, Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS / 1.6)}, "top screw protrosion")
-	walls = sdf.Union2D(walls, rProt, lProt, tProt, bProt)
+	screwHole := sdf.Box2D(v2.Vec{X: WALL_THICKNESS / 3, Y: WALL_THICKNESS * 2.2}, 0)
+	rHole := loggedMovement(screwHole, v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS / 1.6), Y: 0}, "right screw hole")
+	lHole := loggedMovement(screwHole, v2.Vec{X: -(BODY_SIZE_X / 2) - -(WALL_THICKNESS / 1.6), Y: 0}, "left screw hole")
+	tHole := sdf.Transform2D(screwHole, sdf.Rotate2d(sdf.DtoR(90)))
+	bHole := loggedMovement(tHole, v2.Vec{X: 0, Y: -(BODY_SIZE_Y / 2) - -(WALL_THICKNESS / 1.6)}, "bottom screw hole")
+	tHole = loggedMovement(tHole, v2.Vec{X: 0, Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS / 1.6)}, "top screw hole")
+	walls = sdf.Union2D(walls, rHole, lHole, tHole, bHole)
+
+	corner := trapezoid(v2.Vec{X: WALL_THICKNESS, Y: WALL_THICKNESS}, WALL_THICKNESS)
+	brCorner := sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(45)))
+	brCorner = loggedMovement(brCorner, v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS), Y: -(BODY_SIZE_Y / 2) - -(WALL_THICKNESS)}, "bottom right wall corner")
+	blCorner := sdf.Transform2D(brCorner, sdf.MirrorY())
+	trCorner := sdf.Transform2D(brCorner, sdf.MirrorX())
+	tlCorner := sdf.Transform2D(trCorner, sdf.MirrorY())
+	walls = sdf.Union2D(walls, brCorner, blCorner, trCorner, tlCorner)
 
 	screws := screwHoles()
 	walls = sdf.Difference2D(walls, screws)
@@ -54,7 +62,6 @@ func wallsPlane() sdf.SDF2 {
 }
 
 // screwHoles produces m4 screwHoles along the sides of the piece.
-// TODO: Corners need to be adjusted.
 func screwHoles() sdf.SDF2 {
 	hole, _ := sdf.Circle2D(M4_SCREW_DIAMETER / 2)
 	holes := make([]sdf.SDF2, 14) // 1 top + 1 bottom + (1 * 2 corners) + 2 right, + 1 center = 7 for one side, 14 for two sides.
@@ -68,7 +75,7 @@ func screwHoles() sdf.SDF2 {
 	holes[0] = sdf.Transform2D(holes[0], sdf.Translate2d(v2.Vec{X: centerOffset, Y: 0}))
 	holes[1] = sdf.Transform2D(holes[1], sdf.Translate2d(v2.Vec{X: centerOffset, Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS / buffer)}))
 	holes[2] = sdf.Transform2D(holes[1], sdf.MirrorX())
-	holes[3] = sdf.Transform2D(holes[3], sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS / buffer), Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS / buffer)}))
+	holes[3] = sdf.Transform2D(holes[3], sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS), Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS)}))
 	holes[4] = sdf.Transform2D(holes[3], sdf.MirrorX())
 	holes[5] = sdf.Transform2D(holes[5], sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS / buffer), Y: sideOffset}))
 	holes[6] = sdf.Transform2D(holes[5], sdf.MirrorX())
