@@ -36,14 +36,14 @@ func trapezoid(base v2.Vec, xChange float64) sdf.SDF2 {
 }
 
 // split2DPlane splits a 2D plane in half. 0 is right side and 1 is left side.
-func split2DPlane(plane sdf.SDF2, height float64) []sdf.SDF2 {
+func split2DPlane(plane sdf.SDF2) []sdf.SDF2 {
 	planes := make([]sdf.SDF2, 2)
 
 	rPlane := sdf.Cut2D(plane, v2.Vec{X: 0, Y: 0}, v2.Vec{X: 0, Y: 1})
 	planes[0] = rPlane
 
 	lPlane := sdf.Transform2D(sdf.Cut2D(sdf.Transform2D(plane, sdf.MirrorY()), v2.Vec{X: 0, Y: 0}, v2.Vec{X: 0, Y: 1}), sdf.MirrorY())
-	planes[0] = lPlane
+	planes[1] = lPlane
 
 	return planes
 }
