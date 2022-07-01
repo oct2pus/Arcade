@@ -95,3 +95,15 @@ func screwHoles() sdf.SDF2 {
 
 	return sdf.Union2D(holes...)
 }
+
+// wallCorner returns the wall but split into one corner of the wall, specifically the top right corner.
+func wallCorner() sdf.SDF2 {
+	segmentPlane := wallsPlane()
+	segmentPlane = split2DPlane(segmentPlane)[0]
+	segmentPlane = sdf.Center2D(segmentPlane)
+	segmentPlane = sdf.Transform2D(segmentPlane, sdf.Rotate2d(sdf.DtoR(90)))
+	segmentPlane = sdf.Center2D(segmentPlane)
+	segmentPlane = split2DPlane(segmentPlane)[0]
+	segmentPlane = sdf.Center2D(segmentPlane)
+	return segmentPlane
+}
