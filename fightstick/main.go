@@ -10,16 +10,14 @@ import (
 
 func main() {
 	tops := split2DPlane(topPlane())
-	//	walls := split2DPlane(wallsPlane())
 	bottoms := split2DPlane(bottomPlane())
 	render.RenderDXF(topPlane(), 600, "top.dxf")
 	render.RenderDXF(wallsPlane(), 600, "walls.dxf")
-	render.RenderDXF(wallCorner(), 600, "wallcorner.dxf")
-	render.RenderDXF(innerWallPlane(), 600, "innerwall.dxf")
-	render.ToSTL(wallFrontLeft(), 400, "wallfrontleft.stl", dc.NewDualContouringDefault())
-	render.ToSTL(wallFrontRight(), 400, "wallfrontright.stl", dc.NewDualContouringDefault())
 	render.ToSTL(wallBackLeft(), 400, "wallbackleft.stl", dc.NewDualContouringDefault())
 	render.ToSTL(wallBackRight(), 400, "wallbackright.stl", dc.NewDualContouringDefault())
+	render.ToSTL(wallFrontLeft(), 400, "wallfrontleft.stl", dc.NewDualContouringDefault())
+	render.ToSTL(wallFrontRight(), 400, "wallfrontright.stl", dc.NewDualContouringDefault())
+	render.ToSTL(innerWall(), 400, "innerwall.stl", dc.NewDualContouringDefault())
 	for i, ele := range tops {
 		render.ToSTL(sdf.Extrude3D(ele, 3), 400, "top-"+strconv.Itoa(i)+".stl", dc.NewDualContouringDefault())
 	}
