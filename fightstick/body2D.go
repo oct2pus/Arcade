@@ -68,7 +68,7 @@ func bottomPlane() sdf.SDF2 {
 }
 
 func innerWallPlane() sdf.SDF2 {
-	wall := sdf.Box2D(v2.Vec{X: 6, Y: BODY_SIZE_Y}, 0)
+	wall := sdf.Box2D(v2.Vec{X: 12, Y: BODY_SIZE_Y}, 0)
 
 	wall = sdf.Difference2D(wall, screwHoles())
 
