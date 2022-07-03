@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	BODY_SIZE_X    = 300
-	BODY_SIZE_Y    = 215
-	BODY_SIZE_Z    = 3 + 45 + 3 //Top + Walls + Base
-	BODY_CURVE     = 10
-	WALL_THICKNESS = 6.9
+	BODY_SIZE_X      = 300
+	BODY_SIZE_Y      = 215
+	BODY_SIZE_Z      = 3 + 45 + 3 //Top + Walls + Base
+	BODY_CURVE       = 10
+	WALL_THICKNESS   = 6.9
+	INNER_WALL_WIDTH = 12.0
 )
 
 // topPlane produces a 2D top-down image of the fightstick's top panel.
@@ -68,7 +69,7 @@ func bottomPlane() sdf.SDF2 {
 }
 
 func innerWallPlane() sdf.SDF2 {
-	wall := sdf.Box2D(v2.Vec{X: 12, Y: BODY_SIZE_Y}, 0)
+	wall := sdf.Box2D(v2.Vec{X: INNER_WALL_WIDTH, Y: BODY_SIZE_Y}, 0)
 
 	wall = sdf.Difference2D(wall, screwHoles())
 
@@ -102,7 +103,7 @@ func screwHoles() sdf.SDF2 {
 }
 
 // wallCorner returns one corner of the wall.
-func wallCorner() sdf.SDF2 {
+func wallCornerPlane() sdf.SDF2 {
 	segmentPlane := wallsPlane()
 	segmentPlane = split2DPlane(segmentPlane)[0]
 	segmentPlane = sdf.Center2D(segmentPlane)

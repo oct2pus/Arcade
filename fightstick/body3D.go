@@ -12,13 +12,21 @@ const (
 	TOP_HEIGHT    = 3.0
 	WALLS_HEIGHT  = 45.0
 	BOTTOM_HEIGHT = 3.0
+	WALL_NOTCH    = 5.0
 )
+
+func wallCorner() sdf.SDF3 {
+	corner := sdf.Extrude3D(wallCornerPlane(), WALLS_HEIGHT)
+	cutout, _ := sdf.Box3D(v3.Vec{X: 12, Y: INNER_WALL_WIDTH, Z: WALLS_HEIGHT - WALL_NOTCH*2}, 0) //X is arbitrary
+
+	corner = sdf.Difference3D(corner, sdf.Transform3D(cutout, sdf.Translate3d(v3.Vec{X: BODY_SIZE_X/3 + cutout.BoundingBox().Max.X, Y: 0, Z: 0})))
+	return corner
+}
 
 // wallFrontRight is the front right wall. This houses the neutrik connector.
 // TODO: Test that measurement because this shit will be infuriating if i print it wrong
 func wallFrontRight() sdf.SDF3 {
-	corner2D := wallCorner()
-	corner := sdf.Extrude3D(corner2D, WALLS_HEIGHT)
+	corner := wallCorner()
 
 	neutrik2D, err := sdf.Circle2D(BUTTON24_DIAMETER / 2)
 	if err != nil {
@@ -43,10 +51,11 @@ func wallFrontRight() sdf.SDF3 {
 }
 
 //wallFrontLeft is the front left wall. This houses 4 24mm buttons.
+// TODO: Rotate this properly
 func wallFrontLeft() sdf.SDF3 {
-	corner2D := wallCorner()
-	corner2D = sdf.Transform2D(corner2D, sdf.Rotate2d(sdf.DtoR(270)))
-	corner := sdf.Extrude3D(corner2D, WALLS_HEIGHT)
+	corner := wallCorner()
+	// Could be removed, just need to modify how functionButtons move
+	corner = sdf.Transform3D(corner, sdf.Rotate3d(v3.Vec{X: 0, Y: 0, Z: 1}, sdf.DtoR(270)))
 
 	functionButtons := sdf.Extrude3D(functionRow(), WALL_THICKNESS)
 	functionButtons = sdf.Transform3D(functionButtons, sdf.RotateX(sdf.DtoR(90)))
@@ -61,14 +70,48 @@ func wallFrontLeft() sdf.SDF3 {
 //wallBackRight is the back right wall.
 func wallBackRight() sdf.SDF3 {
 	corner := wallCorner()
-	corner = sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(270)))
-	return sdf.Extrude3D(corner, WALLS_HEIGHT)
+	corner = sdf.Transform3D(corner, sdf.RotateZ(sdf.DtoR(270)))
+	return corner
 }
 
 //wallBackLeft is the back left wall.
 func wallBackLeft() sdf.SDF3 {
 	corner := wallCorner()
-	corner = sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(270)))
-	corner = sdf.Transform2D(corner, sdf.MirrorY())
-	return sdf.Extrude3D(corner, WALLS_HEIGHT)
+	corner = sdf.Transform3D(corner, sdf.RotateZ(sdf.DtoR(270)))
+	corner = sdf.Transform3D(corner, sdf.MirrorYZ())
+	return corner
+}
+
+func innerWall() sdf.SDF3 {
+	wall := sdf.Extrude3D(innerWallPlane(), WALLS_HEIGHT)
+
+	// cut off edges
+	edgeCutout, _ := sdf.Box3D(v3.Vec{X: INNER_WALL_WIDTH, Y: WALL_THICKNESS, Z: WALL_NOTCH}, 0)
+	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - WALL_THICKNESS/2, Z: WALLS_HEIGHT/2 - (5 / 2)})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - WALL_THICKNESS/2, Z: -WALLS_HEIGHT/2 - -(5 / 2)})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -WALL_THICKNESS/2, Z: WALLS_HEIGHT/2 - (5 / 2)})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -WALL_THICKNESS/2, Z: -WALLS_HEIGHT/2 - -(5 / 2)})))
+
+	//fill the center holes
+
+	filler, _ := sdf.Box3D(v3.Vec{X: INNER_WALL_WIDTH, Y: WALL_THICKNESS, Z: 10}, 0) // Z is arbitrary, bigger than center portion
+	wall = sdf.Union3D(wall, filler)
+
+	// create holes for wires to pass through
+	centerCutout := sdf.Extrude3D(trapezoid(v2.Vec{X: BODY_SIZE_Y / 3, Y: WALLS_HEIGHT / 3}, -WALLS_HEIGHT/3), INNER_WALL_WIDTH)
+	centerCutout = sdf.Transform3D(centerCutout, sdf.RotateX(sdf.DtoR(90)))
+	centerCutout = sdf.Transform3D(centerCutout, sdf.RotateZ(sdf.DtoR(90)))
+
+	rotatedCenterCutout := sdf.Transform3D(centerCutout, sdf.RotateX(sdf.DtoR(180)))
+
+	// here comes the ugly bit
+	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - centerCutout.BoundingBox().Max.Y*1.3, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
+	// FLIP IT TURNWAYS
+	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
+
+	return wall
 }
