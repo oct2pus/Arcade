@@ -70,6 +70,7 @@ func wallBackRight() sdf.SDF3 {
 //TODO: ROTATE
 func wallBackLeft() sdf.SDF3 {
 	corner := wallCorner()
-	corner = sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(180)))
+	corner = sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(270)))
+	corner = sdf.Transform2D(corner, sdf.MirrorY())
 	return sdf.Extrude3D(corner, WALLS_HEIGHT)
 }
