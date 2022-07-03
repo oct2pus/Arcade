@@ -27,8 +27,7 @@ func topPlane() sdf.SDF2 {
 	buttons = loggedMovement(buttons, v2.Vec{X: top.BoundingBox().Max.X / 2, Y: top.BoundingBox().Max.Y / 4}, "button cluster")
 	top = sdf.Difference2D(top, buttons)
 
-	screws := screwHoles()
-	top = sdf.Difference2D(top, screws)
+	top = sdf.Difference2D(top, screwHoles())
 
 	return top
 }
@@ -55,8 +54,7 @@ func wallsPlane() sdf.SDF2 {
 	tlCorner := sdf.Transform2D(trCorner, sdf.MirrorY())
 	walls = sdf.Union2D(walls, brCorner, blCorner, trCorner, tlCorner)
 
-	screws := screwHoles()
-	walls = sdf.Difference2D(walls, screws)
+	walls = sdf.Difference2D(walls, screwHoles())
 
 	return walls
 }
@@ -64,8 +62,7 @@ func wallsPlane() sdf.SDF2 {
 func bottomPlane() sdf.SDF2 {
 	bottom := sdf.Box2D(v2.Vec{X: BODY_SIZE_X, Y: BODY_SIZE_Y}, BODY_CURVE)
 
-	screws := screwHoles()
-	bottom = sdf.Difference2D(bottom, screws)
+	bottom = sdf.Difference2D(bottom, screwHoles())
 
 	return bottom
 }
