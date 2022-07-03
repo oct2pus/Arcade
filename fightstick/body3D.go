@@ -53,6 +53,8 @@ func wallFrontLeft() sdf.SDF3 {
 	functionButtons = sdf.Transform3D(functionButtons, sdf.Translate3d(v3.Vec{X: BODY_SIZE_X/4.5 + (WALL_THICKNESS / 2), Y: -BODY_SIZE_Y / 2, Z: 0}))
 	corner = sdf.Difference3D(corner, functionButtons)
 
+	corner = sdf.Transform3D(corner, sdf.Rotate3d(v3.Vec{X: 0, Y: 0, Z: 1}, sdf.DtoR(180)))
+
 	return corner
 }
 
