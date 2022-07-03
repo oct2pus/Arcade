@@ -59,7 +59,6 @@ func wallFrontLeft() sdf.SDF3 {
 }
 
 //wallBackRight is the back right wall.
-//TODO: ROTATE
 func wallBackRight() sdf.SDF3 {
 	corner := wallCorner()
 	corner = sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(270)))
@@ -67,7 +66,6 @@ func wallBackRight() sdf.SDF3 {
 }
 
 //wallBackLeft is the back left wall.
-//TODO: ROTATE
 func wallBackLeft() sdf.SDF3 {
 	corner := wallCorner()
 	corner = sdf.Transform2D(corner, sdf.Rotate2d(sdf.DtoR(270)))
