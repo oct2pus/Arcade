@@ -36,6 +36,9 @@ func wallFrontRight() sdf.SDF3 {
 	neutrik = sdf.Transform3D(neutrik, sdf.Translate3d(v3.Vec{X: BODY_SIZE_X/3 + (WALL_THICKNESS / 2), Y: BODY_SIZE_Y / 3, Z: 0}))
 	corner = sdf.Difference3D(corner, neutrik)
 
+	corner = sdf.Transform3D(corner, sdf.MirrorYZ())
+	corner = sdf.Transform3D(corner, sdf.Rotate3d(v3.Vec{X: 0, Y: 0, Z: 1}, sdf.DtoR(270)))
+
 	return corner
 }
 
