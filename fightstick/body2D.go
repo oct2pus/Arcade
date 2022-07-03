@@ -70,6 +70,14 @@ func bottomPlane() sdf.SDF2 {
 	return bottom
 }
 
+func innerWallPlane() sdf.SDF2 {
+	wall := sdf.Box2D(v2.Vec{X: 6, Y: BODY_SIZE_Y}, 0)
+
+	wall = sdf.Difference2D(wall, screwHoles())
+
+	return wall
+}
+
 // screwHoles produces m4 screwHoles along the sides of the piece.
 func screwHoles() sdf.SDF2 {
 	hole, _ := sdf.Circle2D(M4_SCREW_DIAMETER / 2)
