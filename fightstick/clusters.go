@@ -1,13 +1,15 @@
 package main
 
 import (
+	"log"
+
 	"github.com/deadsy/sdfx/sdf"
 	v2 "github.com/deadsy/sdfx/vec/v2"
 )
 
 const (
-	BUTTON30_DIAMETER      = 30
-	BUTTON24_DIAMETER      = 24
+	BUTTON30_DIAMETER      = 30.5
+	BUTTON24_DIAMETER      = 24.5
 	M4_SCREW_DIAMETER      = 4
 	JOYSTICK_HOLE_DIAMETER = 24
 )
@@ -50,6 +52,7 @@ func functionRow() sdf.SDF2 {
 	return functionRow
 }
 
+// joystick is a hole for a joystick, with screw mounts.
 // https://support.focusattack.com/hc/en-us/articles/360015744451-Sanwa-JLF-P1-Mounting-Plate-Measurements
 // reference for screw hole mounting points
 func joystick(holeSpacing v2.Vec) sdf.SDF2 {
@@ -64,4 +67,21 @@ func joystick(holeSpacing v2.Vec) sdf.SDF2 {
 	joystickHole, _ := sdf.Circle2D(JOYSTICK_HOLE_DIAMETER / 2)
 	holes = append(holes, joystickHole)
 	return sdf.Union2D(holes...)
+}
+
+// neutrik is a hole for a neutrik connector.
+// https://focusattack.com/cliff-electronics-usb-c-to-usb-c-passthrough/
+// reference for neutrik connector dimensions
+func neutrik() sdf.SDF2 {
+	neutrik2D, err := sdf.Circle2D(BUTTON24_DIAMETER / 2)
+	if err != nil {
+		log.Printf("error: %v\n", err)
+	}
+	m3Screw, err := sdf.Circle2D(3.2 / 2)
+	if err != nil {
+		log.Printf("error: %v\n", err)
+	}
+	neutrik2D = sdf.Union2D(neutrik2D, sdf.Transform2D(m3Screw, sdf.Translate2d(v2.Vec{X: -19.1 / 2, Y: 24 / 2})))
+	neutrik2D = sdf.Union2D(neutrik2D, sdf.Transform2D(m3Screw, sdf.Translate2d(v2.Vec{X: 19.1 / 2, Y: -24 / 2})))
+	return neutrik2D
 }

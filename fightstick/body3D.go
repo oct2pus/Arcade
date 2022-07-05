@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/deadsy/sdfx/sdf"
 	v2 "github.com/deadsy/sdfx/vec/v2"
 	v3 "github.com/deadsy/sdfx/vec/v3"
@@ -28,19 +26,10 @@ func wallCorner() sdf.SDF3 {
 func wallFrontRight() sdf.SDF3 {
 	corner := wallCorner()
 
-	neutrik2D, err := sdf.Circle2D(BUTTON24_DIAMETER / 2)
-	if err != nil {
-		log.Printf("error: %v\n", err)
-	}
-	m3Screw, err := sdf.Circle2D(3 / 2)
-	if err != nil {
-		log.Printf("error: %v\n", err)
-	}
-	neutrik2D = sdf.Union2D(neutrik2D, sdf.Transform2D(m3Screw, sdf.Translate2d(v2.Vec{X: -19 / 2, Y: 24 / 2})))
-	neutrik2D = sdf.Union2D(neutrik2D, sdf.Transform2D(m3Screw, sdf.Translate2d(v2.Vec{X: 19 / 2, Y: -24 / 2})))
-
-	neutrik := sdf.Extrude3D(neutrik2D, WALL_THICKNESS)
+	neutrik := sdf.Extrude3D(neutrik(), WALL_THICKNESS)
+	neutrik = sdf.Transform3D(neutrik, sdf.RotateZ(sdf.DtoR(90)))
 	neutrik = sdf.Transform3D(neutrik, sdf.RotateY(sdf.DtoR(90)))
+	neutrik = sdf.Transform3D(neutrik, sdf.MirrorXY())
 	neutrik = sdf.Transform3D(neutrik, sdf.Translate3d(v3.Vec{X: BODY_SIZE_X/3 + (WALL_THICKNESS / 2), Y: BODY_SIZE_Y / 3, Z: 0}))
 	corner = sdf.Difference3D(corner, neutrik)
 
