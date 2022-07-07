@@ -76,32 +76,6 @@ func innerWallPlane() sdf.SDF2 {
 	return wall
 }
 
-// screwHoles produces m4 screwHoles along the sides of the piece.
-func screwHoles() sdf.SDF2 {
-	hole, _ := sdf.Circle2D(M4_SCREW_DIAMETER / 2)
-	holes := make([]sdf.SDF2, 14) // 1 top + 1 bottom + (1 * 2 corners) + 2 right, + 1 center = 7 for one side, 14 for two sides.
-	for i := range holes {
-		holes[i] = hole
-	}
-	centerOffset := 3.0
-	sideOffset := 4.0
-	buffer := 2.5
-	// right side
-	holes[0] = sdf.Transform2D(holes[0], sdf.Translate2d(v2.Vec{X: centerOffset, Y: 0}))
-	holes[1] = sdf.Transform2D(holes[1], sdf.Translate2d(v2.Vec{X: centerOffset, Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS / buffer)}))
-	holes[2] = sdf.Transform2D(holes[1], sdf.MirrorX())
-	holes[3] = sdf.Transform2D(holes[3], sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS), Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS)}))
-	holes[4] = sdf.Transform2D(holes[3], sdf.MirrorX())
-	holes[5] = sdf.Transform2D(holes[5], sdf.Translate2d(v2.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS / buffer), Y: sideOffset}))
-	holes[6] = sdf.Transform2D(holes[5], sdf.MirrorX())
-
-	for o := 0; o < len(holes)/2; o++ {
-		holes[o+len(holes)/2] = sdf.Transform2D(holes[o], sdf.MirrorY())
-	}
-
-	return sdf.Union2D(holes...)
-}
-
 // wallCorner returns one corner of the wall.
 func wallCornerPlane() sdf.SDF2 {
 	segmentPlane := wallsPlane()
