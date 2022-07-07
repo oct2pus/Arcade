@@ -13,16 +13,7 @@ const (
 	WALL_NOTCH    = 5.0
 )
 
-func wallCorner() sdf.SDF3 {
-	corner := sdf.Extrude3D(wallCornerPlane(), WALLS_HEIGHT)
-	cutout, _ := sdf.Box3D(v3.Vec{X: 12, Y: INNER_WALL_WIDTH, Z: WALLS_HEIGHT - WALL_NOTCH*2}, 0) //X is arbitrary
-
-	corner = sdf.Difference3D(corner, sdf.Transform3D(cutout, sdf.Translate3d(v3.Vec{X: BODY_SIZE_X/3 + cutout.BoundingBox().Max.X, Y: 0, Z: 0})))
-	return corner
-}
-
 // wallFrontRight is the front right wall. This houses the neutrik connector.
-// TODO: Test that measurement because this shit will be infuriating if i print it wrong
 func wallFrontRight() sdf.SDF3 {
 	corner := wallCorner()
 
@@ -40,7 +31,6 @@ func wallFrontRight() sdf.SDF3 {
 }
 
 //wallFrontLeft is the front left wall. This houses 4 24mm buttons.
-// TODO: Rotate this properly
 func wallFrontLeft() sdf.SDF3 {
 	corner := wallCorner()
 	// Could be removed, just need to modify how functionButtons move
@@ -71,6 +61,7 @@ func wallBackLeft() sdf.SDF3 {
 	return corner
 }
 
+// inner wall is an internal wall to hold the fightstick together.
 func innerWall() sdf.SDF3 {
 	wall := sdf.Extrude3D(innerWallPlane(), WALLS_HEIGHT)
 
@@ -103,4 +94,12 @@ func innerWall() sdf.SDF3 {
 	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
 
 	return wall
+}
+
+func wallCorner() sdf.SDF3 {
+	corner := sdf.Extrude3D(wallCornerPlane(), WALLS_HEIGHT)
+	cutout, _ := sdf.Box3D(v3.Vec{X: 12, Y: INNER_WALL_WIDTH, Z: WALLS_HEIGHT - WALL_NOTCH*2}, 0) //X is arbitrary
+
+	corner = sdf.Difference3D(corner, sdf.Transform3D(cutout, sdf.Translate3d(v3.Vec{X: BODY_SIZE_X/3 + cutout.BoundingBox().Max.X, Y: 0, Z: 0})))
+	return corner
 }
