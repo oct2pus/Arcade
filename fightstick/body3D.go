@@ -66,12 +66,12 @@ func innerWall() sdf.SDF3 {
 	wall := sdf.Extrude3D(innerWallPlane(), WALLS_HEIGHT)
 
 	// cut off edges
-	edgeCutout, _ := sdf.Box3D(v3.Vec{X: INNER_WALL_WIDTH, Y: WALL_THICKNESS, Z: WALL_NOTCH}, 0)
-	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - WALL_THICKNESS/2, Z: WALLS_HEIGHT/2 - (5 / 2)})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - WALL_THICKNESS/2, Z: -WALLS_HEIGHT/2 - -(5 / 2)})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -WALL_THICKNESS/2, Z: WALLS_HEIGHT/2 - (5 / 2)})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(edgeCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -WALL_THICKNESS/2, Z: -WALLS_HEIGHT/2 - -(5 / 2)})))
+	end, _ := sdf.Box3D(v3.Vec{X: INNER_WALL_WIDTH, Y: WALL_THICKNESS, Z: WALLS_HEIGHT}, 0)
+	cutout, _ := sdf.Box3D(v3.Vec{X: 12, Y: INNER_WALL_WIDTH, Z: WALLS_HEIGHT - (WALL_NOTCH+0.3)*2}, 0)
+	endCutout := sdf.Difference3D(end, cutout)
 
+	wall = sdf.Difference3D(wall, sdf.Transform3D(endCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - WALL_THICKNESS/2, Z: 0})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(endCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -WALL_THICKNESS/2, Z: 0})))
 	//fill the center holes
 
 	filler, _ := sdf.Box3D(v3.Vec{X: INNER_WALL_WIDTH, Y: WALL_THICKNESS, Z: 10}, 0) // Z is arbitrary, bigger than center portion
@@ -85,13 +85,13 @@ func innerWall() sdf.SDF3 {
 	rotatedCenterCutout := sdf.Transform3D(centerCutout, sdf.RotateX(sdf.DtoR(180)))
 
 	// here comes the ugly bit
-	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - centerCutout.BoundingBox().Max.Y*1.3, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - centerCutout.BoundingBox().Max.Y*1.3, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: -WALLS_HEIGHT/2 - -centerCutout.BoundingBox().Max.Z*1.5})))
 	// FLIP IT TURNWAYS
-	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
-	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: BODY_SIZE_Y/2 - centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(rotatedCenterCutout, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
+	wall = sdf.Difference3D(wall, sdf.Transform3D(centerCutout, sdf.Translate3d(v3.Vec{X: 0, Y: -BODY_SIZE_Y/2 - -centerCutout.BoundingBox().Max.Y*1.3, Z: WALLS_HEIGHT/2 - centerCutout.BoundingBox().Max.Z*1.5})))
 
 	return wall
 }
