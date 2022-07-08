@@ -54,11 +54,11 @@ func split3DModel(model sdf.SDF3) []sdf.SDF3 {
 	//plane := sdf.Slice2D(model, v3.Vec{X: 0, Y: 0, Z: 0}, v3.Vec{X: 0, Y: 0, Z: 0})
 
 	//rPlane := sdf.Cut2D(plane, v2.Vec{X: 0, Y: 0}, v2.Vec{X: 0, Y: 1})
-	rModel := sdf.Cut3D(model, v3.Vec{X: 0, Y: 0, Z: 0}, v3.Vec{X: 0, Y: 1, Z: 0})
+	rModel := sdf.Cut3D(model, v3.Vec{X: 0, Y: 0, Z: 0}, v3.Vec{X: 1, Y: 0, Z: 0})
 	models[0] = rModel
 
 	//lPlane := sdf.Transform2D(sdf.Cut2D(sdf.Transform2D(plane, sdf.MirrorY()), v2.Vec{X: 0, Y: 0}, v2.Vec{X: 0, Y: 1}), sdf.MirrorY())
-	lModel := sdf.Transform3D(sdf.Cut3D(sdf.Transform3D(model, sdf.MirrorXY()), v3.Vec{X: 0, Y: 0, Z: 0}, v3.Vec{X: 0, Y: 1, Z: 0}), sdf.MirrorXY())
+	lModel := sdf.Transform3D(sdf.Cut3D(sdf.Transform3D(model, sdf.MirrorYZ()), v3.Vec{X: 0, Y: 0, Z: 0}, v3.Vec{X: 0, Y: 1, Z: 0}), sdf.MirrorXY())
 	models[1] = lModel
 
 	return models
