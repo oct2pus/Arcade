@@ -5,6 +5,7 @@ import (
 
 	"github.com/deadsy/sdfx/sdf"
 	v2 "github.com/deadsy/sdfx/vec/v2"
+	v3 "github.com/deadsy/sdfx/vec/v3"
 )
 
 const (
@@ -113,4 +114,32 @@ func screwHoles() sdf.SDF2 {
 	}
 
 	return sdf.Union2D(holes...)
+}
+
+// screwHoles produces m4 screwHoles along the sides of the piece.
+func screwCountersinks() sdf.SDF3 {
+	cone, _ := sdf.Cone3D(2.3, M4_SCREW_DIAMETER/2, 7.2/2, 0)
+	coneCenter, _ := sdf.Cone3D(2.3, M3_SCREW_DIAMETER/2, 5.6/2, 0)
+	cones := make([]sdf.SDF3, 14) // 1 top + 1 bottom + (1 * 2 corners) + 2 right, + 1 center = 7 for one side, 14 for two sides.
+	for i := range cones {
+		cones[i] = cone
+	}
+	centerOffset := 3.0
+	sideOffset := 4.0
+	buffer := 2.5
+	// right side
+	cones[0] = coneCenter
+	cones[0] = sdf.Transform3D(cones[0], sdf.Translate3d(v3.Vec{X: centerOffset, Y: 0, Z: 0}))
+	cones[1] = sdf.Transform3D(cones[1], sdf.Translate3d(v3.Vec{X: centerOffset, Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS / buffer), Z: 0}))
+	cones[2] = sdf.Transform3D(cones[1], sdf.MirrorXZ())
+	cones[3] = sdf.Transform3D(cones[3], sdf.Translate3d(v3.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS), Y: (BODY_SIZE_Y / 2) - (WALL_THICKNESS), Z: 0}))
+	cones[4] = sdf.Transform3D(cones[3], sdf.MirrorXZ())
+	cones[5] = sdf.Transform3D(cones[5], sdf.Translate3d(v3.Vec{X: (BODY_SIZE_X / 2) - (WALL_THICKNESS / buffer), Y: sideOffset, Z: 0}))
+	cones[6] = sdf.Transform3D(cones[5], sdf.MirrorXZ())
+
+	for o := 0; o < len(cones)/2; o++ {
+		cones[o+len(cones)/2] = sdf.Transform3D(cones[o], sdf.MirrorYZ())
+	}
+
+	return sdf.Union3D(cones...)
 }

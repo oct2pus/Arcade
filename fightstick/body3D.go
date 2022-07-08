@@ -7,11 +7,27 @@ import (
 )
 
 const (
-	TOP_HEIGHT    = 3.0
+	TOP_HEIGHT    = 4.0
 	WALLS_HEIGHT  = 45.0
 	BOTTOM_HEIGHT = 3.0
 	WALL_NOTCH    = 5.0
 )
+
+func top() sdf.SDF3 {
+	top := sdf.Extrude3D(topPlane(), TOP_HEIGHT)
+	//	screws := sdf.Transform3D(screwCountersinks(), sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: TOP_HEIGHT/2 - screwCountersinks().BoundingBox().Max.Z}))
+	//	top = sdf.Difference3D(top, screws)
+	return top
+}
+
+func topLeft() sdf.SDF3 {
+	return split3DModel(top())[0]
+}
+
+func topRight() sdf.SDF3 {
+	return split3DModel(top())[1]
+
+}
 
 // wallFrontRight is the front right wall. This houses the neutrik connector.
 func wallFrontRight() sdf.SDF3 {

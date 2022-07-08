@@ -8,11 +8,14 @@ import (
 	"github.com/deadsy/sdfx/sdf"
 )
 
+// TODO: Figure out countersinks lol
 func main() {
 	tops := split2DPlane(topPlane())
 	bottoms := split2DPlane(bottomPlane())
 	render.RenderDXF(topPlane(), 600, "top.dxf")
 	render.RenderDXF(wallsPlane(), 600, "walls.dxf")
+	/*	render.ToSTL(topLeft(), 400, "topLeft.stl", dc.NewDualContouringDefault())
+		render.ToSTL(topLeft(), 400, "topRight.stl", dc.NewDualContouringDefault()) */
 	render.ToSTL(innerWall(), 400, "innerwall.stl", dc.NewDualContouringDefault())
 	render.ToSTL(wallFrontRight(), 400, "wallfrontright.stl", dc.NewDualContouringDefault())
 	render.ToSTL(wallBackLeft(), 400, "wallbackleft.stl", dc.NewDualContouringDefault())
