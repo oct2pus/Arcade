@@ -35,3 +35,11 @@ func countersinkTest() sdf.SDF3 {
 	base = sdf.Difference3D(base, cone)
 	return base
 }
+
+func stickMountTest() sdf.SDF3 {
+	base2D := sdf.Box2D(v2.Vec{X: 100, Y: 55}, 0)
+	joystick := joystick(v2.Vec{X: 84, Y: 10 + 10 + 20})
+	base2D = sdf.Difference2D(base2D, joystick)
+
+	return sdf.Extrude3D(base2D, 1.6)
+}
