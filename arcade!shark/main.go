@@ -15,12 +15,13 @@ func main() {
 
 func ablrzButtonAdapter() sdf.SDF3 {
 	base2D, _ := sdf.Circle2D(19.6 / 2) // measured 19.8
-	base := sdf.Extrude3D(base2D, 3.5-0.9)
+	// base := sdf.Extrude3D(base2D, 3.5-0.9)
+	base := sdf.Extrude3D(base2D, 1)
 
 	line := sdf.Box2D(v2.Vec{X: 1.1, Y: 19.8}, 0)
 	line = sdf.Union2D(line, sdf.Transform2D(line, sdf.Rotate2d(sdf.DtoR(90))))
 
-	cross := sdf.Extrude3D(line, 1)
+	cross := sdf.Extrude3D(line, 0.5)
 	cross = sdf.Transform3D(cross, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: base.BoundingBox().Max.Z - cross.BoundingBox().Max.Z}))
 
 	base = sdf.Difference3D(base, cross)
@@ -30,7 +31,8 @@ func ablrzButtonAdapter() sdf.SDF3 {
 func ablzrSwitchHolder() sdf.SDF3 {
 	base2D, _ := triangle(38.5, 34.5, 4)
 
-	choc2D := sdf.Box2D(v2.Vec{X: 13.8, Y: 13.7}, 0)
+	// last test was at 13.7/13.6
+	choc2D := sdf.Box2D(v2.Vec{X: 13.85, Y: 13.75}, 0)
 	choc2D = sdf.Transform2D(choc2D, sdf.Translate2d(v2.Vec{X: 0, Y: -base2D.BoundingBox().Max.Y / 4}))
 	base2D = sdf.Difference2D(base2D, choc2D)
 
