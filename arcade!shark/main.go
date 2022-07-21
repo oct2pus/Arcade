@@ -31,7 +31,6 @@ func ablrzButtonAdapter() sdf.SDF3 {
 func ablzrSwitchHolder() sdf.SDF3 {
 	base2D, _ := triangle(38.5, 34.5, 4)
 
-	// last test was at 13.7/13.6
 	choc2D := sdf.Box2D(v2.Vec{X: 13.85, Y: 13.75}, 0)
 	choc2D = sdf.Transform2D(choc2D, sdf.Translate2d(v2.Vec{X: 0, Y: -base2D.BoundingBox().Max.Y / 4}))
 	base2D = sdf.Difference2D(base2D, choc2D)
@@ -43,9 +42,24 @@ func ablzrSwitchHolder() sdf.SDF3 {
 		sdf.Transform2D(circle3, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X / 1.30, Y: -base2D.BoundingBox().Max.Y / 1.30})),
 		sdf.Transform2D(circle3, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X / 1.30, Y: -base2D.BoundingBox().Max.Y / 1.30})),
 	)
-	base2D = sdf.Difference2D(base2D, circles)
 
-	return sdf.Extrude3D(base2D, 1.4)
+	base2D = sdf.Difference2D(base2D, circles)
+	mount3, _ := sdf.Circle2D(5.5 / 2)
+	mount45, _ := sdf.Circle2D(6.5 / 2)
+	mounts := sdf.Union2D(
+		sdf.Transform2D(mount45, sdf.Translate2d(v2.Vec{X: 0, Y: base2D.BoundingBox().Max.Y / 1.25})),
+		sdf.Transform2D(mount3, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X / 1.30, Y: -base2D.BoundingBox().Max.Y / 1.30})),
+		sdf.Transform2D(mount3, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X / 1.30, Y: -base2D.BoundingBox().Max.Y / 1.30})),
+	)
+
+	mounts = sdf.Difference2D(mounts, circles)
+
+	pegs := sdf.Extrude3D(mounts, 3)
+	base := sdf.Extrude3D(base2D, 1.6)
+
+	pegs = sdf.Transform3D(pegs, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: -base.BoundingBox().Max.Z + pegs.BoundingBox().Max.Z}))
+
+	return sdf.Union3D(base, pegs)
 }
 
 /*func triangle(sides float64) (sdf.SDF2, error) {
