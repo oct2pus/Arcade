@@ -24,7 +24,16 @@ func ablrzButtonAdapter() sdf.SDF3 {
 	cross := sdf.Extrude3D(line, 0.5)
 	cross = sdf.Transform3D(cross, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: base.BoundingBox().Max.Z - cross.BoundingBox().Max.Z}))
 
+	stem2D := sdf.Box2D(sdf.V2{X: 1.2, Y: 3}, 0)
+	stems := make([]sdf.SDF3, 2)
+	for i := range stems {
+		stems[i] = sdf.Extrude3D(stem2D, 4)
+		stems[i] = sdf.Transform3D(stems[i], sdf.Translate3d(sdf.V3{X: 2.85, Y: 0, Z: -base.BoundingBox().Max.Z - (stems[i].BoundingBox().Max.Z)}))
+	}
+	stems[1] = sdf.Transform3D(stems[1], sdf.MirrorYZ())
+
 	base = sdf.Difference3D(base, cross)
+	base = sdf.Union3D(base, sdf.Union3D(stems...))
 	return base
 }
 
