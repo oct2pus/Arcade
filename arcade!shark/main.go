@@ -71,11 +71,6 @@ func ablzrSwitchHolder() sdf.SDF3 {
 	return sdf.Union3D(base, pegs)
 }
 
-/*func triangle(sides float64) (sdf.SDF2, error) {
-	dimensions := []v2.Vec{{X: -sides / 2, Y: 0}, {X: 0, Y: sides / 2}, {X: sides / 2, Y: 0}}
-	return sdf.Polygon2D(dimensions)
-}*/
-
 func triangle(base, height, trim float64) (sdf.SDF2, error) {
 	dimensions := []v2.Vec{
 		{X: (-base / 2) - (-trim), Y: (-height / 2)},
