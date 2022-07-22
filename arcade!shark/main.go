@@ -11,8 +11,9 @@ import (
 const CHOC_SWITCH_X, CHOC_SWITCH_Y = 13.85, 13.75
 
 func main() {
-	render.ToSTL(ablzrSwitchHolder(), 200, "ablzrSwitchHolder.stl", dc.NewDualContouringDefault())
-	render.ToSTL(ablrzButtonAdapter(), 200, "ablrzButtonAdapter.stl", dc.NewDualContouringDefault())
+	render.ToSTL(dPadAdapter(), 300, "dPadAdapter.stl", dc.NewDualContouringDefault())
+	render.ToSTL(ablzrSwitchHolder(), 300, "ablzrSwitchHolder.stl", dc.NewDualContouringDefault())
+	render.ToSTL(ablrzButtonAdapter(), 300, "ablrzButtonAdapter.stl", dc.NewDualContouringDefault())
 }
 
 func ablrzButtonAdapter() sdf.SDF3 {
@@ -88,4 +89,38 @@ func triangle(base, height, trim float64) (sdf.SDF2, error) {
 	return triangle, err
 }
 
-func dPadAdapter()
+func dPadAdapter() sdf.SDF3 {
+	base2D := sdf.Box2D(v2.Vec{X: 49.5, Y: 49.5}, 0)
+
+	choc := sdf.Box2D(v2.Vec{X: CHOC_SWITCH_X + 0.5, Y: CHOC_SWITCH_Y + 0.5}, 0)
+	chocs := sdf.Union2D(
+		sdf.Transform2D(choc, sdf.Translate2d(v2.Vec{X: 15.4, Y: 0})),
+		sdf.Transform2D(choc, sdf.Translate2d(v2.Vec{X: -15.4, Y: 0})),
+		sdf.Transform2D(choc, sdf.Translate2d(v2.Vec{X: 0, Y: 15.4})),
+		sdf.Transform2D(choc, sdf.Translate2d(v2.Vec{X: 0, Y: -15.4})),
+	)
+	base2D = sdf.Difference2D(base2D, chocs)
+
+	center, _ := sdf.Circle2D(13.8 / 2)
+	base2D = sdf.Difference2D(base2D, center)
+
+	edge, _ := sdf.Circle2D(7)
+	edges := sdf.Union2D(
+		sdf.Transform2D(edge, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X, Y: base2D.BoundingBox().Max.Y})),
+		sdf.Transform2D(edge, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X, Y: -base2D.BoundingBox().Max.Y})),
+		sdf.Transform2D(edge, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X, Y: -base2D.BoundingBox().Max.Y})),
+		sdf.Transform2D(edge, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X, Y: base2D.BoundingBox().Max.Y})),
+	)
+	base2D = sdf.Difference2D(base2D, edges)
+
+	screwHole, _ := sdf.Circle2D(3.5 / 2)
+	holes := sdf.Union2D(
+		sdf.Transform2D(screwHole, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X - screwHole.BoundingBox().Max.X - 9.1, Y: base2D.BoundingBox().Max.Y - screwHole.BoundingBox().Max.Y - 9.1})),
+		sdf.Transform2D(screwHole, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X - (-screwHole.BoundingBox().Max.X) - (-9.1), Y: -base2D.BoundingBox().Max.Y - (-screwHole.BoundingBox().Max.Y) - (-9.1)})),
+	)
+	base2D = sdf.Difference2D(base2D, holes)
+
+	base := sdf.Extrude3D(base2D, 1.5)
+
+	return base
+}
