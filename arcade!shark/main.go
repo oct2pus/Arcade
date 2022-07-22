@@ -8,6 +8,8 @@ import (
 	v3 "github.com/deadsy/sdfx/vec/v3"
 )
 
+const CHOC_SWITCH_X, CHOC_SWITCH_Y = 13.85, 13.75
+
 func main() {
 	render.ToSTL(ablzrSwitchHolder(), 200, "ablzrSwitchHolder.stl", dc.NewDualContouringDefault())
 	render.ToSTL(ablrzButtonAdapter(), 200, "ablrzButtonAdapter.stl", dc.NewDualContouringDefault())
@@ -40,7 +42,7 @@ func ablrzButtonAdapter() sdf.SDF3 {
 func ablzrSwitchHolder() sdf.SDF3 {
 	base2D, _ := triangle(38.5, 34.5, 4)
 
-	choc2D := sdf.Box2D(v2.Vec{X: 13.85, Y: 13.75}, 0)
+	choc2D := sdf.Box2D(v2.Vec{X: CHOC_SWITCH_X, Y: CHOC_SWITCH_Y}, 0)
 	choc2D = sdf.Transform2D(choc2D, sdf.Translate2d(v2.Vec{X: 0, Y: -base2D.BoundingBox().Max.Y / 4}))
 	base2D = sdf.Difference2D(base2D, choc2D)
 
@@ -85,3 +87,5 @@ func triangle(base, height, trim float64) (sdf.SDF2, error) {
 	triangle = sdf.Center2D(triangle)
 	return triangle, err
 }
+
+func dPadAdapter()
