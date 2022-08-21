@@ -115,8 +115,8 @@ func dPadAdapter() sdf.SDF3 {
 
 	screwHole, _ := sdf.Circle2D(3.5 / 2)
 	holes := sdf.Union2D(
-		sdf.Transform2D(screwHole, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X - screwHole.BoundingBox().Max.X - 9.1, Y: base2D.BoundingBox().Max.Y - screwHole.BoundingBox().Max.Y - 9.1})),
-		sdf.Transform2D(screwHole, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X - (-screwHole.BoundingBox().Max.X) - (-9.1), Y: -base2D.BoundingBox().Max.Y - (-screwHole.BoundingBox().Max.Y) - (-9.1)})),
+		sdf.Transform2D(screwHole, sdf.Translate2d(v2.Vec{X: base2D.BoundingBox().Max.X - screwHole.BoundingBox().Max.X - 7.6, Y: base2D.BoundingBox().Max.Y - screwHole.BoundingBox().Max.Y - 7.6})),
+		sdf.Transform2D(screwHole, sdf.Translate2d(v2.Vec{X: -base2D.BoundingBox().Max.X - (-screwHole.BoundingBox().Max.X) - (-7.6), Y: -base2D.BoundingBox().Max.Y - (-screwHole.BoundingBox().Max.Y) - (-7.6)})),
 	)
 	base2D = sdf.Difference2D(base2D, holes)
 
