@@ -1,0 +1,45 @@
+(footprint "membrane_button" (version 20211014) (generator pcbnew)
+  (layer "F.Cu")
+  (tedit 0)
+  (fp_text reference "REF**" (at -2.562 -2.1 unlocked) (layer "F.SilkS")
+    (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp 6e2ea278-c29c-4db1-be02-5a748b658f65)
+  )
+  (fp_text value "membrane_button" (at -2.562 -0.6 unlocked) (layer "F.Fab")
+    (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp aeb0ae77-8fe7-491f-b6d8-90dc75341196)
+  )
+  (fp_text user "${REFERENCE}" (at -2.562 0.9 unlocked) (layer "F.Fab")
+    (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp c7e0af33-ed46-4a41-a219-a8a07c791547)
+  )
+  (fp_rect (start -1.8 4.2) (end -5.6 4.6) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 1481dcaa-226e-4963-bf4c-17f89bc7c150))
+  (fp_rect (start -1.8 1) (end -5.6 1.4) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 4f2d6430-88c3-4ffc-9d51-4abf04f5560f))
+  (fp_rect (start -5.962 0.2) (end -2.2 0.6) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 59e4169d-ba02-4a70-8e89-2b5f30371b7b))
+  (fp_rect (start -5.962 0.2) (end -7.562 4.6) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 6501aa7f-c79c-46ae-9a84-8f6bee465ea8))
+  (fp_rect (start -0.2 0.2) (end -1.8 4.6) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 884c7f94-f969-447c-a3e1-9539d9688faf))
+  (fp_rect (start -6 1.8) (end -2.2 2.2) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 91449e71-5992-4b49-905c-d712733cba78))
+  (fp_rect (start -6 3.4) (end -2.2 3.8) (layer "F.Mask") (width 0.2) (fill solid) (tstamp 99aa8134-d1cd-4953-89b9-aef0b4a350d7))
+  (fp_rect (start -5.6 2.6) (end -1.8 3) (layer "F.Mask") (width 0.2) (fill solid) (tstamp e0028e6b-ce86-4cb4-b85d-282bc284818b))
+  (pad "1" smd custom (at -7.8 4) (size 1.524 1.524) (layers "F.Cu" "F.Mask")
+    (options (clearance outline) (anchor circle))
+    (primitives
+    ) (tstamp fbd3305c-7006-4781-b50d-62c921384e6b))
+  (pad "2" smd custom (at 0 0.8) (size 1.524 1.524) (layers "F.Cu" "F.Mask")
+    (options (clearance outline) (anchor circle))
+    (primitives
+    ) (tstamp a095414b-38ce-485d-ab8f-1158e3276771))
+  (group "" (id 45e2e9b8-8d8f-45e1-ad74-5dcdea8ae3e0)
+    (members
+      a095414b-38ce-485d-ab8f-1158e3276771
+    )
+  )
+  (group "" (id c4928cce-7ffe-41c0-afe5-164d46583c09)
+    (members
+      59e4169d-ba02-4a70-8e89-2b5f30371b7b
+      6501aa7f-c79c-46ae-9a84-8f6bee465ea8
+      91449e71-5992-4b49-905c-d712733cba78
+      99aa8134-d1cd-4953-89b9-aef0b4a350d7
+    )
+  )
+)
