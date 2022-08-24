@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	render.ToSTL(usbCMount(), 300, "usbCMount.stl", dc.NewDualContouringDefault())
+	render.ToSTL(usbCCover(), 300, "usbCCover.stl", dc.NewDualContouringDefault())
 	render.ToSTL(screenCover(), 300, "screenCover.stl", dc.NewDualContouringDefault())
 	render.ToSTL(picoAdapter(), 300, "picoAdapter.stl", dc.NewDualContouringDefault())
 }
@@ -124,4 +126,63 @@ func screenCover() sdf.SDF3 {
 
 	body = sdf.Union3D(body, pegHolders)
 	return body
+}
+
+func usbCCover() sdf.SDF3 {
+
+	usbcWidth := 9.15
+	usbcHeight := 3.42
+	outHoleX, outHoleY := 14.6, 7.2
+	catchX, catchY := 17.0, 9.2
+	z := 3.6
+
+	usbCcutout2D := sdf.Box2D(v2.Vec{X: usbcWidth, Y: usbcHeight}, 0.25)
+
+	usbAplug2D := sdf.Box2D(v2.Vec{X: outHoleX, Y: outHoleY}, 1)
+	usbAplug2D = sdf.Difference2D(usbAplug2D, usbCcutout2D)
+
+	catch2D := sdf.Box2D(v2.Vec{X: catchX, Y: catchY}, 1)
+	catch2D = sdf.Difference2D(catch2D, usbCcutout2D)
+
+	usbAplug := sdf.Extrude3D(usbAplug2D, z)
+	catch := sdf.Extrude3D(catch2D, z/6)
+
+	catch = sdf.Transform3D(catch, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: -z / 2}))
+
+	return sdf.Union3D(usbAplug, catch)
+}
+
+func usbCMount() sdf.SDF3 {
+	pcbholeSpacing := 0.65 * sdf.MillimetresPerInch
+	//pcbholeDiameter := 0.13 * sdf.MillimetresPerInch
+	standoffSpacing := 21.4
+	standoffToWallFull, standoffToWallHole := 18.0, 13.0
+	m25ScrewHoleDiameter := 2.5
+	baseZ, pegsZ := 3.4, 2.6
+
+	base2D := sdf.Box2D(v2.Vec{X: standoffToWallFull, Y: standoffSpacing + 6.0}, 0)
+	standOffHole2D, _ := sdf.Circle2D(m25ScrewHoleDiameter / 2)
+	standOffHoles2D := sdf.Union2D(
+		sdf.Transform2D(standOffHole2D, sdf.Translate2d(v2.Vec{X: (standoffToWallFull-standoffToWallHole)/2 - (m25ScrewHoleDiameter / 2), Y: standoffSpacing / 2})),
+		sdf.Transform2D(standOffHole2D, sdf.Translate2d(v2.Vec{X: (standoffToWallFull-standoffToWallHole)/2 - (m25ScrewHoleDiameter / 2), Y: -standoffSpacing / 2})),
+	)
+	base2D = sdf.Difference2D(base2D, standOffHoles2D)
+
+	peg2D, _ := sdf.Circle2D(m25ScrewHoleDiameter)
+	pegHoles2D := sdf.Union2D(
+		sdf.Transform2D(standOffHole2D, sdf.Translate2d(v2.Vec{X: 0, Y: pcbholeSpacing / 2})),
+		sdf.Transform2D(standOffHole2D, sdf.Translate2d(v2.Vec{X: 0, Y: -pcbholeSpacing / 2})),
+	)
+	pegs2D := sdf.Union2D(
+		sdf.Transform2D(peg2D, sdf.Translate2d(v2.Vec{X: 0, Y: pcbholeSpacing / 2})),
+		sdf.Transform2D(peg2D, sdf.Translate2d(v2.Vec{X: 0, Y: -pcbholeSpacing / 2})),
+	)
+	pegs2D = sdf.Difference2D(pegs2D, pegHoles2D)
+
+	pegs := sdf.Extrude3D(pegs2D, baseZ)
+	base := sdf.Extrude3D(base2D, pegsZ)
+
+	pegs = sdf.Transform3D(pegs, sdf.Translate3d(v3.Vec{X: -standoffToWallFull/2 - (-m25ScrewHoleDiameter / 4), Y: 0, Z: baseZ/2 + pegsZ/2}))
+
+	return sdf.Union3D(base, pegs)
 }
