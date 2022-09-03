@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	render.ToSTL(switchBoardMount(), 300, "switchBoardMount.stl", dc.NewDualContouringDefault())
 	render.ToSTL(usbCMount(), 300, "usbCMount.stl", dc.NewDualContouringDefault())
 	render.ToSTL(usbCCover(), 300, "usbCCover.stl", dc.NewDualContouringDefault())
 	render.ToSTL(screenCover(), 300, "screenCover.stl", dc.NewDualContouringDefault())
@@ -185,4 +186,66 @@ func usbCMount() sdf.SDF3 {
 	pegs = sdf.Transform3D(pegs, sdf.Translate3d(v3.Vec{X: -standoffToWallFull/2 - (-m25ScrewHoleDiameter / 4), Y: 0, Z: baseZ/2 + pegsZ/2}))
 
 	return sdf.Union3D(base, pegs)
+}
+
+func switchBoardMount() sdf.SDF3 {
+	bodyX, bodyY := 57.0, 26.0
+	holeDiameter := 2.7
+	holeXSpacing, holeYSpacing := 35.3, 18.7
+	chocHole := 13.8
+	z := 3.0
+	LEDMountDiameter, LEDMountWallThickness := 5.9, 1.2
+	LEDLegCutoutX, LEDLegCutoutY := 3.1, 1.0
+
+	// base body for part
+
+	body2D := sdf.Box2D(v2.Vec{X: bodyX, Y: bodyY}, 0)
+
+	mount, _ := sdf.Circle2D(holeDiameter / 2)
+	mounts := sdf.Union2D(
+		sdf.Transform2D(mount, sdf.Translate2d(v2.Vec{X: -holeXSpacing/2 + bodyX/8, Y: -holeYSpacing / 2})),
+		sdf.Transform2D(mount, sdf.Translate2d(v2.Vec{X: holeXSpacing/2 + bodyX/8, Y: holeYSpacing / 2})),
+	)
+
+	choc := sdf.Box2D(v2.Vec{X: chocHole, Y: chocHole}, 0)
+	chocs := sdf.Union2D(
+		sdf.Transform2D(choc, sdf.Translate2d(v2.Vec{X: 15, Y: 0})),
+		sdf.Transform2D(choc, sdf.Translate2d(v2.Vec{X: -15, Y: 0})),
+		choc,
+	)
+	chocs = sdf.Transform2D(chocs, sdf.Translate2d(v2.Vec{X: -chocHole / 4, Y: 0}))
+
+	LedThroughHole2D := sdf.Box2D(v2.Vec{X: LEDLegCutoutX, Y: LEDLegCutoutY}, 0)
+	LedThroughHole2D = sdf.Transform2D(LedThroughHole2D, sdf.Translate2d(v2.Vec{X: bodyX / 2.55, Y: 0}))
+
+	body2D = sdf.Difference2D(body2D, mounts)
+	body2D = sdf.Difference2D(body2D, chocs)
+	body2D = sdf.Difference2D(body2D, LedThroughHole2D)
+
+	// Pegs to provide spacing for choc switches
+
+	peg2D, _ := sdf.Circle2D(holeDiameter / 1.5)
+	pegs2D := sdf.Union2D(
+		sdf.Transform2D(peg2D, sdf.Translate2d(v2.Vec{X: -holeXSpacing/2 + bodyX/8, Y: -holeYSpacing / 2})),
+		sdf.Transform2D(peg2D, sdf.Translate2d(v2.Vec{X: holeXSpacing/2 + bodyX/8, Y: holeYSpacing / 2})),
+	)
+	pegs2D = sdf.Difference2D(pegs2D, mounts)
+
+	pegs := sdf.Extrude3D(pegs2D, z/2)
+	body := sdf.Extrude3D(body2D, z)
+
+	pegs = sdf.Transform3D(pegs, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: z - z/4}))
+	body = sdf.Union3D(body, pegs)
+
+	// Mounting for the LED
+
+	LEDInner, _ := sdf.Circle2D(LEDMountDiameter / 2)
+	LEDOutter, _ := sdf.Circle2D((LEDMountDiameter + LEDMountWallThickness) / 2)
+	LED2D := sdf.Difference2D(LEDOutter, LEDInner)
+
+	LED := sdf.Extrude3D(LED2D, z/2)
+
+	LED = sdf.Transform3D(LED, sdf.Translate3d(v3.Vec{X: bodyX / 2.55, Y: 0, Z: z - z/4}))
+	body = sdf.Union3D(body, LED)
+	return body
 }
