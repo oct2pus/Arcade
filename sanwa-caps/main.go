@@ -14,7 +14,7 @@ func main() {
 	round := 1.0
 	topDiameter := 28.0 - round*2
 	innerDiameter := 26.5 - round*2
-	stemInnerX, stemInnerY := 5.85, 1.55 //0.05 tolerance
+	stemInnerX, stemInnerY := 6.05, 1.6 //0.25 tolerance X, 0.1 tolerance Y
 	stemOuterDiameter := 7.6
 	z := 4.2
 
@@ -61,5 +61,5 @@ func main() {
 		sdf.Transform3D(stem, sdf.Translate3d(v3.Vec{X: 0, Y: 0, Z: z / 2})),
 	)
 
-	render.ToSTL(buttCap, 400, "cap.stl", dc.NewDualContouringDefault())
+	render.ToSTL(buttCap, 200, "cap.stl", dc.NewDualContouringDefault())
 }
