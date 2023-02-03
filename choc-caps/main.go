@@ -8,7 +8,6 @@ import (
 const (
 	// these values are designed to fit into the default flatbox,
 	// tinker with the values to find the size you need.
-	// as a note, buttons come out 0.75 mm wider than expected, size yours accordingly.
 	OCTOGON_SIZE_SMALL = 20.25
 	OCTOGON_SIZE_LARGE = 25.75
 	CIRCLE_SIZE_SMALL  = 22.5
@@ -21,8 +20,6 @@ const (
 	MID_Z  = 3.5
 	STEM_Z = 5
 	// ROUND determines the radius of curves, 0 is sharp edges.
-	// WARNING: this will mess with your size values as well. the 0.75mm wider models as a result
-	// of the 0.5 round.
 	// keep that in mind if you're modifying this program.
 	// each individual Z height *must* be greater than round * 2.
 	ROUND = 0.5
